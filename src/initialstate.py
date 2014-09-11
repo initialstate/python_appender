@@ -21,14 +21,16 @@ class LogStreamer:
 
     def log(self, signal, value, trackerId = ""):
         request_time = datetime.datetime.utcnow().isoformat()
-        conn = httplib.HTTPSConnection("groker-dev.initialstate.com")
-        ##conn = httplib.HTTPConnection("localhost:8081")
+        ##conn = httplib.HTTPSConnection("groker-dev.initialstate.com")
+        conn = httplib.HTTPConnection("localhost:8081")
         resource = "/logs/{bucket}/{clientKey}".format(bucket=self.Bucket, clientKey=self.ClientKey)
         headers = {}
-        headers['Conent-Type'] = 'application/json'
+        headers['Content-Type'] = 'application/json'
         headers['User-Agent'] = 'IS Log Streamer Python Module'
 
         body = {'log': value, 'date_time': request_time, 'signal_source': signal, 'tracker_id': trackerId}
+        print json.dumps(body)
+        conn.set_debuglevel(1)
         conn.request("POST", resource, json.dumps(body), headers)
 
 
