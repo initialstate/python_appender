@@ -1,3 +1,3 @@
 import compileall
 
-compileall.compile_dir("ISStreamer", force=1)
+compileall.compile_dir("src/ISStreamer", force=1)
