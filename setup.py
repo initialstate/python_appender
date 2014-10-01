@@ -6,7 +6,7 @@ def read(fname):
 
 setup(
 	name = "ISStreamer",
-	version = "0.0.2",
+	version = "0.0.1a",
 	author = "David Sulpy, Initial State Technologies",
 	author_email = "david@initialstate.com",
 	description = ("A python module and commandline tool to simplify the process of getting log data to Initial State's platform"),
