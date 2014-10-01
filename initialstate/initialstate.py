@@ -9,6 +9,19 @@ class LogStreamer:
     def __init__(self, bucket="", clientKey=""):
         self.Bucket = bucket
         self.ClientKey = clientKey
+
+        conn = httplib.HTTPSConnection("dev-api.initialstate.com")
+        resource = "/api/v1/buckets"
+        headers = {
+            'Content-Type': 'application/json',
+            'User-Agent': 'IS PyStreamer Module'
+        }
+        body = {
+            'bucketId': self.Bucket,
+            'clientKey': self.ClientKey
+        }
+
+        conn.request("POST", resource, json.dumps(body), headers)
     
     def __getitem__(self, key):
         return self.values[key]
@@ -21,12 +34,11 @@ class LogStreamer:
 
     def log(self, signal, value, trackerId = ""):
         request_time = datetime.datetime.utcnow().isoformat()
-        ##conn = httplib.HTTPSConnection("groker-dev.initialstate.com")
-        conn = httplib.HTTPConnection("localhost:8081")
+        conn = httplib.HTTPSConnection("groker-dev.initialstate.com")
         resource = "/logs/{bucket}/{clientKey}".format(bucket=self.Bucket, clientKey=self.ClientKey)
         headers = {}
         headers['Content-Type'] = 'application/json'
-        headers['User-Agent'] = 'IS Log Streamer Python Module'
+        headers['User-Agent'] = 'IS PyStreamer Module'
 
         body = {'log': value, 'date_time': request_time, 'signal_source': signal, 'tracker_id': trackerId}
         print json.dumps(body)

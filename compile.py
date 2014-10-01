@@ -1,3 +1,3 @@
 import compileall
 
-compileall.compile_dir("src", force=1)
+compileall.compile_dir("initialstate", force=1)
