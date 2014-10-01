@@ -1,4 +1,4 @@
-from initialstate import LogStreamer
+from initialstate_log_streamer import LogStreamer
 
 logger = LogStreamer("example_python_app", "lfYvGA5YuK0whixHCxzvHjNJdWlMovjO")
 
