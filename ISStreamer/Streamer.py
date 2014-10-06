@@ -41,7 +41,7 @@ class Streamer:
         del self.values[key]
 
     def log(self, signal, value, trackerId = ""):
-        request_time = datetime.datetime.utcnow().isoformat()
+        request_time = datetime.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S.%f')[:-3]
         conn = httplib.HTTPSConnection("groker-dev.initialstate.com")
         resource = "/logs/{bucket}/{clientKey}".format(bucket=self.Bucket, clientKey=self.ClientKey)
         headers = {}
