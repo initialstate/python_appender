@@ -52,3 +52,7 @@ docs/_build/
 
 # PyBuilder
 target/
+
+
+# example app private files 
+isstreamer.ini
