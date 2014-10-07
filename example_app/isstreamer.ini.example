@@ -1,0 +1,3 @@
+[isstreamer]
+ClientKey: example_key
+DefaultBucket: hello_world
