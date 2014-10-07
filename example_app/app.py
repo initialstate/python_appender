@@ -1,6 +1,6 @@
-from ISStreamer import Streamer
+from ISStreamer.Streamer import Streamer
 
-logger = Streamer.Streamer()
+logger = Streamer()
 
 logger.log("signal_test", 1)
 logger.log("signal_message", "H")
