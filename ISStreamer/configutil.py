@@ -8,7 +8,10 @@ def getConfig():
     
     config_return = {
         "bucket": "",
-        "key": ""
+        "clientKey": "",
+        "pkey": "pub-c-92056f77-203d-467a-ba28-c5c8695effb6",
+        "skey": "sub-c-1471fc40-4e27-11e4-b332-02ee2ddab7fe",
+        "channel": "log_streamer_dev"
     }
     config_file_exists = False
     config_file_path = config_file_home_path
@@ -22,9 +25,17 @@ def getConfig():
     if (config_file_exists):
         config = ConfigParser.ConfigParser()
         config.read(config_file_path)
-        if (config.has_option("isstreamer", "ClientKey")):
-            config_return["key"] = config.get("isstreamer", "ClientKey")
-        if (config.has_option("isstreamer", "DefaultBucket")):
-            config_return["bucket"] = config.get("isstreamer", "DefaultBucket")
+        if (config.has_section("client_config")):
+            if (config.has_option("client_config", "ClientKey")):
+                config_return["clientKey"] = config.get("client_config", "ClientKey")
+            if (config.has_option("client_config", "DefaultBucket")):
+                config_return["bucket"] = config.get("client_config", "DefaultBucket")
+        if (config.has_section("api_keys")):
+            if (config.has_option("api_keys", "pkey")):
+                config_return["pkey"] = config.get("api_keys", "pkey")
+            if (config.has_option("api_keys", "skey")):
+                config_return["skey"] = config.get("api_keys", "skey")
+            if (config.has_option("api_keys", "channel")):
+                config_return["channel"] = config.get("api_keys", "channel")
 
     return config_return

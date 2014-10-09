@@ -3,13 +3,17 @@ import time
 import configutil
 import httplib
 import json
+import datetime
 
 
 class Streamer:
-    Socket = Pubnub(publish_key="pub-c-92056f77-203d-467a-ba28-c5c8695effb6", subscribe_key="sub-c-1471fc40-4e27-11e4-b332-02ee2ddab7fe", ssl_on=True)
+    Socket = None
     Bucket = ""
     ClientKey = ""
-    def __init__(self, bucket="", clientKey=""):
+    PubKey = ""
+    SubKey = ""
+    Channel = ""
+    def __init__(self, bucket="", clientKey="", apiKeys={}):
         config = configutil.getConfig()
         if (config == None and (bucket=="" or clientKey=="")):
             raise Exception("config not found and arguments empty")
@@ -20,10 +24,26 @@ class Streamer:
             self.Bucket = bucket
 
         if (clientKey == ""):
-            self.ClientKey = config["key"]
+            self.ClientKey = config["clientKey"]
         else:
             self.ClientKey = clientKey
 
+        if ("pkey" in apiKeys):
+            self.PubKey = apiKeys["pkey"]
+        if ("skey" in apiKeys):
+            self.SubKey = apiKeys["skey"]
+        if ("channel" in apiKeys):
+            self.Channel = apiKeys["channel"]
+
+        if (self.PubKey == "" or self.SubKey == "" or self.Channel == ""):
+            self.PubKey = config["pkey"]
+            self.SubKey = config["skey"]
+            self.Channel = config["channel"]
+
+        print self.PubKey
+        print self.SubKey
+        print self.Channel
+        print self.ClientKey
         conn = httplib.HTTPSConnection("dev-api.initialstate.com")
         resource = "/api/v1/buckets"
         headers = {
@@ -37,17 +57,17 @@ class Streamer:
 
         conn.request("POST", resource, json.dumps(body), headers)
 
-        self.Socket = Pubnub(publish_key="pub-c-92056f77-203d-467a-ba28-c5c8695effb6", 
-            subscribe_key="sub-c-1471fc40-4e27-11e4-b332-02ee2ddab7fe", 
+        self.Socket = Pubnub(publish_key=self.PubKey, 
+            subscribe_key=self.SubKey, 
             auth_key=self.ClientKey,
             ssl_on=True)
 
 
     def realtime_log(self, signal, value, async=True):
         timeStamp = time.time()
-        gmtime = time.gmtime(timeStamp)
+        gmtime = datetime.datetime.fromtimestamp(timeStamp)
         def _callback(r):
-            print "{time}: {signal} {value}".format(signal=signal, value=value, time=time.strftime('%Y-%m-%d %H:%M:%S', gmtime))
+            print "{time}: {signal} {value}".format(signal=signal, value=value, time=gmtime.strftime('%Y-%m-%d %H:%M:%S.%f'))
         def _error(r):
             print "error"
 
@@ -58,7 +78,7 @@ class Streamer:
             'value': value,
             'time': timeStamp
         }
-        self.Socket.publish(channel='log_streamer_local', message=log, callback=_callback if async is True else None, error=_error if async is True else None)
+        self.Socket.publish(channel=self.Channel, message=log, callback=_callback if async is True else None, error=_error if async is True else None)
 
 
     def log(self, signal, value):
