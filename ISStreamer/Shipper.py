@@ -9,15 +9,18 @@ class Shipper:
     ClientKey = ""
     def __init__(self, bucket="", clientKey=""):
         config = configutil.getConfig()
-        if (config == None or config["bucket"] == None or config["bucket"] == ""):
-            self.Bucket = bucket
-        else:
-            self.Bucket = config["bucket"]
+        if (config == None and (bucket=="" or clientKey=="")):
+            raise Exception("config not found and arguments empty")
         
-        if (config == None or config["key"] == None or config["key"] == ""):
-            self.ClientKey = clientKey
+        if (bucket == ""):
+            self.Bucket = config["bucket"]
         else:
+            self.Bucket = bucket
+
+        if (clientKey == ""):
             self.ClientKey = config["key"]
+        else:
+            self.ClientKey = clientKey
 
         conn = httplib.HTTPSConnection("dev-api.initialstate.com")
         resource = "/api/v1/buckets"
