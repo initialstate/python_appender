@@ -1,9 +1,15 @@
 from ISStreamer.Streamer import Streamer
 
-logger = Streamer()
+logger = Streamer("bucket_4", debug=True)
 
-logger.log("signal_test", 1)
-logger.log("signal_test", 2)
-logger.log("signal_test", 3)
-logger.log("signal_test", 4)
-logger.log("signal_test", 5)
+
+def stress_test_loop(i):
+	while i > 0:
+		logger.log("stress_test", i)
+		i = i - 1
+
+stress_test_loop(10)
+
+logger.set_bucket("bucket_2_new")
+
+stress_test_loop(10)

@@ -1,9 +1,14 @@
-from Pubnub import Pubnub
-import time
+# local config helper stuff
 import configutil
+# internet connectivity stuff
+from Pubnub import Pubnub
 import httplib
 import json
+# time stuff
 import datetime
+import time
+# performance stuff
+import threading
 
 
 class Streamer:
@@ -13,63 +18,81 @@ class Streamer:
     PubKey = ""
     SubKey = ""
     Channel = ""
-    def __init__(self, bucket="", clientKey="", apiKeys={}):
-        config = configutil.getConfig()
-        if (config == None and (bucket=="" or clientKey=="")):
+    Debug = False
+    def __init__(self, bucket="", client_key="", ini_file_location=None, debug=False):
+
+        config = configutil.getConfig(ini_file_location)
+
+        if (config == None and bucket=="" and client_key == ""):
             raise Exception("config not found and arguments empty")
         
         if (bucket == ""):
-            self.Bucket = config["bucket"]
+            bucket_name = config["bucket"]
         else:
-            self.Bucket = bucket
-
-        if (clientKey == ""):
+            bucket_name = bucket
+        if (client_key == ""):
+            self.ClientKey = client_key
+        else:
             self.ClientKey = config["clientKey"]
-        else:
-            self.ClientKey = clientKey
 
-        if ("pkey" in apiKeys):
-            self.PubKey = apiKeys["pkey"]
-        if ("skey" in apiKeys):
-            self.SubKey = apiKeys["skey"]
-        if ("channel" in apiKeys):
-            self.Channel = apiKeys["channel"]
+        self.PubKey = config["pkey"]
+        self.SubKey = config["skey"]
+        self.Channel = config["channel"]
+        self.set_bucket(bucket_name)
+        self.Debug = debug
 
-        if (self.PubKey == "" or self.SubKey == "" or self.Channel == ""):
-            self.PubKey = config["pkey"]
-            self.SubKey = config["skey"]
-            self.Channel = config["channel"]
-
-        print self.PubKey
-        print self.SubKey
-        print self.Channel
-        print self.ClientKey
-        conn = httplib.HTTPSConnection("dev-api.initialstate.com")
-        resource = "/api/v1/buckets"
-        headers = {
-            'Content-Type': 'application/json',
-            'User-Agent': 'IS PyStreamer Module'
-        }
-        body = {
-            'bucketId': self.Bucket,
-            'clientKey': self.ClientKey
-        }
-
-        conn.request("POST", resource, json.dumps(body), headers)
-
+        self.console_message("ClientKey: {clientKey}".format(clientKey=self.ClientKey))
+        self.console_message("PubKey: {pubkey}".format(pubkey=self.PubKey))
+        self.console_message("SubKey: {subkey}".format(subkey=self.SubKey))
+        self.console_message("Channel: {channel}".format(channel=self.Channel))
+        
         self.Socket = Pubnub(publish_key=self.PubKey, 
             subscribe_key=self.SubKey, 
             auth_key=self.ClientKey,
             ssl_on=True)
 
+    
+
+    def set_bucket(self, new_bucket):
+
+        def __create_bucket(new_bucket, client_key):
+            conn = httplib.HTTPSConnection("dev-api.initialstate.com")
+            resource = "/api/v1/buckets"
+            headers = {
+                'Content-Type': 'application/json',
+                'User-Agent': 'IS PyStreamer Module'
+            }
+            body = {
+                'bucketId': new_bucket,
+                'clientKey': client_key
+            }
+
+            conn.request("POST", resource, json.dumps(body), headers)
+
+            response = conn.getresponse()
+            time.sleep(3)
+
+            if (response.status > 200 and response.status < 300):
+                pass
+            else:
+                raise Exception("bucket failed: {status} {reason}".format(status=response.status, reason=response.reason))
+        self.Bucket = new_bucket
+        t = threading.Thread(target=__create_bucket, args=(new_bucket, self.ClientKey))
+        t.daemon = True
+        t.start()
+
+    def console_message(self, message):
+        if (self.Debug):
+            print(message)
 
     def realtime_log(self, signal, value, async=True):
         timeStamp = time.time()
         gmtime = datetime.datetime.fromtimestamp(timeStamp)
+        self.console_message("{time}: {signal} {value}".format(signal=signal, value=value, time=gmtime.strftime('%Y-%m-%d %H:%M:%S.%f')))
         def _callback(r):
-            print "{time}: {signal} {value}".format(signal=signal, value=value, time=gmtime.strftime('%Y-%m-%d %H:%M:%S.%f'))
+            pass
         def _error(r):
-            print "error"
+            self.console_message("error sending message: {r}".format(r=r))
 
         log = {
             'clientKey': self.ClientKey,
