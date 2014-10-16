@@ -31,9 +31,9 @@ class Streamer:
         else:
             bucket_name = bucket
         if (client_key == ""):
-            self.ClientKey = client_key
-        else:
             self.ClientKey = config["clientKey"]
+        else:
+            self.ClientKey = client_key
 
         self.PubKey = config["pkey"]
         self.SubKey = config["skey"]
