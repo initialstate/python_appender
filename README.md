@@ -20,6 +20,9 @@ The package is hosted in PyPI under the package name [ISStreamer](https://pypi.p
 	
 	if you don't see a version number come back, you should install setuptools:
 	
+	```
+	$ sudo apt-get install python-setuptools
+	```
 	
 
 3. (*optional*) Check if you have pip installed:
