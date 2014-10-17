@@ -9,7 +9,8 @@ def getConfig(ini_file_location=None):
             "clientKey": "",
             "pkey": "pub-c-92056f77-203d-467a-ba28-c5c8695effb6",
             "skey": "sub-c-1471fc40-4e27-11e4-b332-02ee2ddab7fe",
-            "channel": "log_streamer_dev"
+            "channel": "log_streamer_dev",
+            "core_api_base": "dev-api.initialstate.com"
         }
 
     if (ini_file_location != None):
@@ -47,7 +48,8 @@ def getConfig(ini_file_location=None):
                 config_return["skey"] = config.get("isstreamer.api_keys", "skey")
             if (config.has_option("isstreamer.api_keys", "channel")):
                 config_return["channel"] = config.get("isstreamer.api_keys", "channel")
-    else:
-        raise Exception("ini can't be found or is unreadable")
+        if (config.has_section("isstreamer.api_config")):
+            if (config.has_option("isstreamer.api_config", "api")):
+                config_return["core_api_base"] = config.get("isstreamer.api_config", "api")
 
     return config_return

@@ -1,2 +1,11 @@
-[isstreamer.client_config]
-ClientKey: example_key
+#[isstreamer.client_config]
+#ClientKey: example_key
+#Bucket: example_bucket
+
+#[isstreamer.api_keys]
+#pkey: pkey
+#skey: skey
+#channel: channel
+
+#[isstreamer.api_config]
+#api: dev-api.initialstate.com

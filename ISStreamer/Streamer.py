@@ -12,6 +12,7 @@ import threading
 
 
 class Streamer:
+    CoreApiBase = ""
     Socket = None
     Bucket = ""
     ClientKey = ""
@@ -38,6 +39,7 @@ class Streamer:
         self.PubKey = config["pkey"]
         self.SubKey = config["skey"]
         self.Channel = config["channel"]
+        self.CoreApiBase = config["core_api_base"]
         self.set_bucket(bucket_name)
         self.Debug = debug
 
@@ -56,7 +58,7 @@ class Streamer:
     def set_bucket(self, new_bucket):
 
         def __create_bucket(new_bucket, client_key):
-            conn = httplib.HTTPSConnection("dev-api.initialstate.com")
+            conn = httplib.HTTPSConnection(self.CoreApiBase)
             resource = "/api/v1/buckets"
             headers = {
                 'Content-Type': 'application/json',
@@ -70,10 +72,9 @@ class Streamer:
             conn.request("POST", resource, json.dumps(body), headers)
 
             response = conn.getresponse()
-            time.sleep(3)
 
             if (response.status > 200 and response.status < 300):
-                pass
+                self.console_message("bucket created successfully!")
             else:
                 raise Exception("bucket failed: {status} {reason}".format(status=response.status, reason=response.reason))
         self.Bucket = new_bucket
