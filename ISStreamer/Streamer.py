@@ -79,7 +79,7 @@ class Streamer:
                 raise Exception("bucket failed: {status} {reason}".format(status=response.status, reason=response.reason))
         self.Bucket = new_bucket
         t = threading.Thread(target=__create_bucket, args=(new_bucket, self.ClientKey))
-        t.daemon = True
+        t.daemon = False
         t.start()
 
     def console_message(self, message):
