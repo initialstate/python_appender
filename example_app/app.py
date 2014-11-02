@@ -1,7 +1,7 @@
 from ISStreamer.Streamer import Streamer
 import time
 
-logger = Streamer("bucket_7",client_key="2wO7oCojtm2eBnZEGXehC6fC1QCepbhd", debug=True)
+logger = Streamer("buffer_bucket_1",client_key="2wO7oCojtm2eBnZEGXehC6fC1QCepbhd", debug=True)
 
 
 def stress_test_loop(i):
@@ -12,6 +12,4 @@ def stress_test_loop(i):
 
 stress_test_loop(100)
 
-#logger.set_bucket("bucket_5_new")
-
-#stress_test_loop(10)
+logger.flush()

@@ -39,18 +39,12 @@ class Streamer:
 
 
         self.LogQueue = Queue.Queue(self.BufferSize)
-        self.PubKey = config["pkey"]
-        self.SubKey = config["skey"]
-        self.Channel = config["channel"]
         self.CoreApiBase = config["core_api_base"]
         self.StreamApiBase = config["stream_api_base"]
         self.set_bucket(bucket_name)
         self.Debug = debug
 
         self.console_message("ClientKey: {clientKey}".format(clientKey=self.ClientKey))
-        self.console_message("PubKey: {pubkey}".format(pubkey=self.PubKey))
-        self.console_message("SubKey: {subkey}".format(subkey=self.SubKey))
-        self.console_message("Channel: {channel}".format(channel=self.Channel))
 
     
 
@@ -95,9 +89,10 @@ class Streamer:
         conn.request('POST', resource, json.dumps(messages), headers)
 
     def flush(self):
-        message = []
+        messages = []
         self.console_message("beginning flush")
         while not self.LogQueue.empty():
+            m = self.LogQueue.get()
             messages.append(m)
         self.ship_messages(messages)
         self.console_message("finished flushing queue")
@@ -110,6 +105,7 @@ class Streamer:
             while(i > 0):
                 m = self.LogQueue.get()
                 messages.append(m)
+                i = i - 1
 
             self.console_message("shipping 10")
             self.ship_messages(messages)
@@ -118,10 +114,12 @@ class Streamer:
 
         def __realtime_log(time_stamp, signal, value):
             if (self.LogQueue.qsize() >= 10):
+                self.console_message("queue size greater than 10, shipping!")
                 t = threading.Thread(target=__ship_ten)
                 t.daemon = False
                 t.start()
             else:
+                self.console_message("queueing log item")
                 log_item = {
                     "bucketId": self.Bucket,
                     "log": value,
@@ -135,4 +133,4 @@ class Streamer:
         formatted_gmTime = gmtime.strftime('%Y-%m-%d %H:%M:%S.%f')
         self.console_message("{time}: {signal} {value}".format(signal=signal, value=value, time=formatted_gmTime))
 
-        __reatime_log(signal, value)
+        __realtime_log(formatted_gmTime, signal, value)
