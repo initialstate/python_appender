@@ -1,7 +1,6 @@
 # local config helper stuff
 import configutil
 # internet connectivity stuff
-from Pubnub import Pubnub
 import httplib
 import json
 # time stuff
@@ -9,16 +8,18 @@ import datetime
 import time
 # performance stuff
 import threading
-
+import Queue
 
 class Streamer:
     CoreApiBase = ""
-    Socket = None
     Bucket = ""
     ClientKey = ""
     PubKey = ""
     SubKey = ""
     Channel = ""
+    BufferSize = 10
+    StreamApiBase = ""
+    LogQueue = None
     Debug = False
     def __init__(self, bucket="", client_key="", ini_file_location=None, debug=False):
 
@@ -36,10 +37,13 @@ class Streamer:
         else:
             self.ClientKey = client_key
 
+
+        self.LogQueue = Queue.Queue(self.BufferSize)
         self.PubKey = config["pkey"]
         self.SubKey = config["skey"]
         self.Channel = config["channel"]
         self.CoreApiBase = config["core_api_base"]
+        self.StreamApiBase = config["stream_api_base"]
         self.set_bucket(bucket_name)
         self.Debug = debug
 
@@ -47,11 +51,6 @@ class Streamer:
         self.console_message("PubKey: {pubkey}".format(pubkey=self.PubKey))
         self.console_message("SubKey: {subkey}".format(subkey=self.SubKey))
         self.console_message("Channel: {channel}".format(channel=self.Channel))
-        
-        self.Socket = Pubnub(publish_key=self.PubKey, 
-            subscribe_key=self.SubKey, 
-            auth_key=self.ClientKey,
-            ssl_on=True)
 
     
 
@@ -86,24 +85,54 @@ class Streamer:
         if (self.Debug):
             print(message)
 
-    def realtime_log(self, signal, value, async=True):
-        timeStamp = time.time()
-        gmtime = datetime.datetime.fromtimestamp(timeStamp)
-        self.console_message("{time}: {signal} {value}".format(signal=signal, value=value, time=gmtime.strftime('%Y-%m-%d %H:%M:%S.%f')))
-        def _callback(r):
-            pass
-        def _error(r):
-            self.console_message("error sending message: {r}".format(r=r))
-
-        log = {
-            'clientKey': self.ClientKey,
-            'bucket': self.Bucket,
-            'signal': signal,
-            'value': value,
-            'time': timeStamp
+    def ship_messages(self, messages):
+        conn = httplib.HTTPSConnection(self.StreamApiBase)
+        resource = "/batch_logs/{ckey}".format(ckey=self.ClientKey)
+        headers = {
+            'Content-Type': 'application/json',
+            'User-Agent': 'IS PyStreamer Module'
         }
-        self.Socket.publish(channel=self.Channel, message=log, callback=_callback if async is True else None, error=_error if async is True else None)
+        conn.request('POST', resource, json.dumps(messages), headers)
+
+    def flush(self):
+        message = []
+        self.console_message("beginning flush")
+        while not self.LogQueue.empty():
+            messages.append(m)
+        self.ship_messages(messages)
+        self.console_message("finished flushing queue")
 
 
     def log(self, signal, value):
-        self.realtime_log(signal, value)
+        def __ship_ten():
+            i = 10
+            messages = []
+            while(i > 0):
+                m = self.LogQueue.get()
+                messages.append(m)
+
+            self.console_message("shipping 10")
+            self.ship_messages(messages)
+            self.console_message("finished shipping 10")
+
+
+        def __realtime_log(time_stamp, signal, value):
+            if (self.LogQueue.qsize() >= 10):
+                t = threading.Thread(target=__ship_ten)
+                t.daemon = False
+                t.start()
+            else:
+                log_item = {
+                    "bucketId": self.Bucket,
+                    "log": value,
+                    "date_time": time_stamp,
+                    "signal_source": signal
+                }
+                self.LogQueue.put(log_item)
+
+        timeStamp = time.time()
+        gmtime = datetime.datetime.fromtimestamp(timeStamp)
+        formatted_gmTime = gmtime.strftime('%Y-%m-%d %H:%M:%S.%f')
+        self.console_message("{time}: {signal} {value}".format(signal=signal, value=value, time=formatted_gmTime))
+
+        __reatime_log(signal, value)
