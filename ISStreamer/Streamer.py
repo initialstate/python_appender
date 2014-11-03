@@ -57,7 +57,7 @@ class Streamer:
             resource = "/api/v1/buckets"
             headers = {
                 'Content-Type': 'application/json',
-                'User-Agent': 'PyStreamer v' + __version__
+                'User-Agent': 'PyStreamer v' + version.__version__
             }
             body = {
                 'bucketId': new_bucket,
@@ -89,7 +89,7 @@ class Streamer:
         resource = "/batch_logs/{ckey}".format(ckey=self.ClientKey)
         headers = {
             'Content-Type': 'application/json',
-            'User-Agent': 'PyStreamer v' + __version__
+            'User-Agent': 'PyStreamer v' + version.__version__
         }
 
         self.console_message("ship it!", level=2)
