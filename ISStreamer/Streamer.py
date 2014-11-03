@@ -81,8 +81,7 @@ class Streamer:
             print(message)
 
     def ship_messages(self, messages):
-        ##conn = httplib.HTTPSConnection(self.StreamApiBase)
-        conn = httplib.HTTPConnection(self.StreamApiBase)
+        conn = httplib.HTTPSConnection(self.StreamApiBase)
         resource = "/batch_logs/{ckey}".format(ckey=self.ClientKey)
         headers = {
             'Content-Type': 'application/json',
