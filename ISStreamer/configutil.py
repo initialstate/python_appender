@@ -50,7 +50,9 @@ def getConfig(ini_file_location=None):
             if (config.has_option("isstreamer.api_keys", "channel")):
                 config_return["channel"] = config.get("isstreamer.api_keys", "channel")
         if (config.has_section("isstreamer.api_config")):
-            if (config.has_option("isstreamer.api_config", "api")):
-                config_return["core_api_base"] = config.get("isstreamer.api_config", "api")
+            if (config.has_option("isstreamer.api_config", "core_api_base")):
+                config_return["core_api_base"] = config.get("isstreamer.api_config", "core_api_base")
+            if (config.has_option("isstreamer.api_config", "stream_api_base")):
+                config_return["stream_api_base"] = config.get("isstreamer.api_config", "stream_api_base")
 
     return config_return

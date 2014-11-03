@@ -45,7 +45,8 @@ class Streamer:
         self.Debug = debug
 
         self.console_message("ClientKey: {clientKey}".format(clientKey=self.ClientKey))
-
+        self.console_message("core_api_base: {api}".format(api=self.CoreApiBase))
+        self.console_message("stream_api_base: {api}".format(api=self.StreamApiBase))
     
 
     def set_bucket(self, new_bucket):
@@ -80,7 +81,8 @@ class Streamer:
             print(message)
 
     def ship_messages(self, messages):
-        conn = httplib.HTTPSConnection(self.StreamApiBase)
+        ##conn = httplib.HTTPSConnection(self.StreamApiBase)
+        conn = httplib.HTTPConnection(self.StreamApiBase)
         resource = "/batch_logs/{ckey}".format(ckey=self.ClientKey)
         headers = {
             'Content-Type': 'application/json',
@@ -112,25 +114,22 @@ class Streamer:
             self.console_message("finished shipping 10")
 
 
-        def __realtime_log(time_stamp, signal, value):
-            if (self.LogQueue.qsize() >= 10):
-                self.console_message("queue size greater than 10, shipping!")
-                t = threading.Thread(target=__ship_ten)
-                t.daemon = False
-                t.start()
-            else:
-                self.console_message("queueing log item")
-                log_item = {
-                    "bucketId": self.Bucket,
-                    "log": value,
-                    "date_time": time_stamp,
-                    "signal_source": signal
-                }
-                self.LogQueue.put(log_item)
-
         timeStamp = time.time()
         gmtime = datetime.datetime.fromtimestamp(timeStamp)
         formatted_gmTime = gmtime.strftime('%Y-%m-%d %H:%M:%S.%f')
         self.console_message("{time}: {signal} {value}".format(signal=signal, value=value, time=formatted_gmTime))
-
-        __realtime_log(formatted_gmTime, signal, value)
+        if (self.LogQueue.qsize() >= 10):
+            self.console_message("queue size greater than 10, shipping!")
+            t = threading.Thread(target=__ship_ten)
+            t.daemon = False
+            t.start()
+        else:
+            self.console_message("queueing log item")
+            log_item = {
+                "bucketId": self.Bucket,
+                "log": value,
+                "date_time": formatted_gmTime,
+                "signal_source": signal,
+                "epoc": timeStamp
+            }
+            self.LogQueue.put(log_item)
