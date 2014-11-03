@@ -1,5 +1,6 @@
 # local config helper stuff
 import configutil
+import version
 # internet connectivity stuff
 import httplib
 import json
@@ -56,7 +57,7 @@ class Streamer:
             resource = "/api/v1/buckets"
             headers = {
                 'Content-Type': 'application/json',
-                'User-Agent': 'IS PyStreamer Module'
+                'User-Agent': 'PyStreamer v' + __version__
             }
             body = {
                 'bucketId': new_bucket,
@@ -84,17 +85,16 @@ class Streamer:
             print(message)
 
     def ship_messages(self, messages, retries=3):
-        retry_attempts = retries
         conn = httplib.HTTPSConnection(self.StreamApiBase)
         resource = "/batch_logs/{ckey}".format(ckey=self.ClientKey)
         headers = {
             'Content-Type': 'application/json',
-            'User-Agent': 'IS PyStreamer Module'
+            'User-Agent': 'PyStreamer v' + __version__
         }
 
         self.console_message("ship it!", level=2)
 
-        def __ship():
+        def __ship(retry_attempts):
             if (retry_attempts <= 0):
                 if (self.DebugLevel >= 2):
                     raise Exception("shipping logs failed.. network issue?")
@@ -107,9 +107,9 @@ class Streamer:
             else:
                 self.console_message("ship failed, trying again (StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason))
                 retry_attempts = retry_attempts - 1
-                __ship()
+                __ship(retry_attempts)
 
-        __ship()
+        __ship(retries)
             
 
     def flush(self):
