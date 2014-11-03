@@ -50,7 +50,7 @@ class Streamer:
         self.console_message("stream_api_base: {api}".format(api=self.StreamApiBase))
     
 
-    def set_bucket(self, new_bucket):
+    def set_bucket(self, new_bucket, retries=3):
 
         def __create_bucket(new_bucket, client_key):
             conn = httplib.HTTPSConnection(self.CoreApiBase)
@@ -64,17 +64,24 @@ class Streamer:
                 'clientKey': client_key
             }
 
-            conn.request("POST", resource, json.dumps(body), headers)
+            def ___ship(retry_attempts):
+                if (retry_attempts <= 0):
+                    if (self.DebugLevel >= 2):
+                        raise Exception("bucket create failed")
+                    else:
+                        self.console_message("ISStreamer failed to create or find bucket after a number of attempts", level=0)
 
-            response = conn.getresponse()
+                conn.request("POST", resource, json.dumps(body), headers)
 
-            if (response.status >= 200 and response.status < 300):
-                self.console_message("bucket created successfully!")
-            else:
-                if (self.DebugLevel >= 2):
-                    raise Exception("bucket failed: {status} {reason}".format(status=response.status, reason=response.reason))
+                response = conn.getresponse()
+
+                if (response.status >= 200 and response.status < 300):
+                    self.console_message("bucket created successfully!", level=2)
                 else:
-                    self.console_message("ISStreamer failed to setup the bucket. StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason), level=0)
+                    self.console_message("ISStreamer failed to setup the bucket on attempt {atmpt}. StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
+                    retry_attempts = retry_attempts - 1
+                    ___ship(retry_attempts)
+
         self.Bucket = new_bucket
         t = threading.Thread(target=__create_bucket, args=(new_bucket, self.ClientKey))
         t.daemon = False
@@ -105,7 +112,7 @@ class Streamer:
             if (response.status >= 200 and response.status < 300):
                 self.console_message("ship success!", level=2)
             else:
-                self.console_message("ship failed, trying again (StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason))
+                self.console_message("ship failed on attempt {atmpt} (StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
                 retry_attempts = retry_attempts - 1
                 __ship(retry_attempts)
 
