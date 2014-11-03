@@ -20,8 +20,8 @@ class Streamer:
     BufferSize = 10
     StreamApiBase = ""
     LogQueue = None
-    Debug = False
-    def __init__(self, bucket="", client_key="", ini_file_location=None, debug=False):
+    DebugLevel = 0
+    def __init__(self, bucket="", client_key="", ini_file_location=None, debug_level=0):
 
         config = configutil.getConfig(ini_file_location)
 
@@ -42,7 +42,7 @@ class Streamer:
         self.CoreApiBase = config["core_api_base"]
         self.StreamApiBase = config["stream_api_base"]
         self.set_bucket(bucket_name)
-        self.Debug = debug
+        self.DebugLevel = debug_level
 
         self.console_message("ClientKey: {clientKey}".format(clientKey=self.ClientKey))
         self.console_message("core_api_base: {api}".format(api=self.CoreApiBase))
@@ -67,36 +67,60 @@ class Streamer:
 
             response = conn.getresponse()
 
-            if (response.status > 200 and response.status < 300):
+            if (response.status >= 200 and response.status < 300):
                 self.console_message("bucket created successfully!")
             else:
-                raise Exception("bucket failed: {status} {reason}".format(status=response.status, reason=response.reason))
+                if (self.DebugLevel >= 2):
+                    raise Exception("bucket failed: {status} {reason}".format(status=response.status, reason=response.reason))
+                else:
+                    self.console_message("ISStreamer failed to setup the bucket. StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason), level=0)
         self.Bucket = new_bucket
         t = threading.Thread(target=__create_bucket, args=(new_bucket, self.ClientKey))
         t.daemon = False
         t.start()
 
-    def console_message(self, message):
-        if (self.Debug):
+    def console_message(self, message, level=1):
+        if (self.DebugLevel >= level):
             print(message)
 
-    def ship_messages(self, messages):
+    def ship_messages(self, messages, retries=3):
         conn = httplib.HTTPSConnection(self.StreamApiBase)
         resource = "/batch_logs/{ckey}".format(ckey=self.ClientKey)
         headers = {
             'Content-Type': 'application/json',
             'User-Agent': 'IS PyStreamer Module'
         }
-        conn.request('POST', resource, json.dumps(messages), headers)
+
+        self.console_message("ship it!", level=2)
+
+        def __ship():
+            if (retries <= 0):
+                if (self.DebugLevel >= 2):
+                    raise Exception("shipping logs failed.. network issue?")
+                else:
+                    self.console_message("ISStreamer failed to ship the logs after a number of attempts", level=0)
+            conn.request('POST', resource, json.dumps(messages), headers)
+            response = conn.getresponse()
+            if (response.status >= 200 and response.status < 300):
+                self.console_message("ship success!", level=2)
+            else:
+                self.console_message("ship failed, trying again (StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason))
+                retries = retries - 1
+                __ship()
+
+        __ship()
+            
 
     def flush(self):
         messages = []
-        self.console_message("beginning flush")
+        self.console_message("checking queue", level=2)
         while not self.LogQueue.empty():
             m = self.LogQueue.get()
             messages.append(m)
-        self.ship_messages(messages)
-        self.console_message("finished flushing queue")
+        if len(messages) > 0:
+            self.console_message("queue not empty, flushing", level=2)
+            self.ship_messages(messages)
+        self.console_message("finished flushing queue", level=2)
 
 
     def log(self, signal, value):
@@ -108,9 +132,9 @@ class Streamer:
                 messages.append(m)
                 i = i - 1
 
-            self.console_message("shipping 10")
+            self.console_message("shipping 10", level=2)
             self.ship_messages(messages)
-            self.console_message("finished shipping 10")
+            self.console_message("finished shipping 10", level=2)
 
 
         timeStamp = time.time()
@@ -132,3 +156,6 @@ class Streamer:
                 "epoc": timeStamp
             }
             self.LogQueue.put(log_item)
+
+    def __del__(self):
+        flush()

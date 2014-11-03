@@ -2,10 +2,6 @@
 #ClientKey: example_key
 #Bucket: example_bucket
 
-#[isstreamer.api_keys]
-#pkey: pkey
-#skey: skey
-#channel: channel
-
 #[isstreamer.api_config]
-#api: dev-api.initialstate.com
+#core_api_base: dev-api.initialstate.com
+#stream_api_base: groker-dev.initialstate.com
