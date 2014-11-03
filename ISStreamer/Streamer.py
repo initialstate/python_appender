@@ -96,12 +96,16 @@ class Streamer:
 
                 conn.request("POST", resource, json.dumps(body), headers)
 
-                response = conn.getresponse()
+                try:
+                    response = conn.getresponse()
 
-                if (response.status >= 200 and response.status < 300):
-                    self.console_message("bucket created successfully!", level=2)
-                else:
-                    self.console_message("ISStreamer failed to setup the bucket on attempt {atmpt}. StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
+                    if (response.status >= 200 and response.status < 300):
+                        self.console_message("bucket created successfully!", level=2)
+                    else:
+                        self.console_message("ISStreamer failed to setup the bucket on attempt {atmpt}. StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
+                        raise Exception("ship exception")
+                except:
+                    self.console_message("exception creating bucket on attempt {atmpt}.".format(atmpt=retry_attempts))
                     retry_attempts = retry_attempts - 1
                     ___ship(retry_attempts)
 
@@ -143,11 +147,15 @@ class Streamer:
                 else:
                     self.console_message("ISStreamer failed to ship the logs after a number of attempts", level=0)
             conn.request('POST', resource, json.dumps(messages), headers)
-            response = conn.getresponse()
-            if (response.status >= 200 and response.status < 300):
-                self.console_message("ship success!", level=2)
-            else:
-                self.console_message("ship failed on attempt {atmpt} (StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
+            try:
+                response = conn.getresponse()
+                if (response.status >= 200 and response.status < 300):
+                    self.console_message("ship success!", level=2)
+                else:
+                    self.console_message("ship failed on attempt {atmpt} (StatusCode: {sc}; Reason: {r})".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
+                    raise Exception("ship exception")
+            except:
+                self.console_message("exception shipping logs on attempt {atmpt}.".format(atmpt=retry_attempts))
                 retry_attempts = retry_attempts - 1
                 __ship(retry_attempts)
 
