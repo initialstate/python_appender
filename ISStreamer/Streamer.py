@@ -84,6 +84,7 @@ class Streamer:
             print(message)
 
     def ship_messages(self, messages, retries=3):
+        retry_attempts = retries
         conn = httplib.HTTPSConnection(self.StreamApiBase)
         resource = "/batch_logs/{ckey}".format(ckey=self.ClientKey)
         headers = {
@@ -94,7 +95,7 @@ class Streamer:
         self.console_message("ship it!", level=2)
 
         def __ship():
-            if (retries <= 0):
+            if (retry_attempts <= 0):
                 if (self.DebugLevel >= 2):
                     raise Exception("shipping logs failed.. network issue?")
                 else:
@@ -105,7 +106,7 @@ class Streamer:
                 self.console_message("ship success!", level=2)
             else:
                 self.console_message("ship failed, trying again (StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason))
-                retries = retries - 1
+                retry_attempts = retry_attempts - 1
                 __ship()
 
         __ship()
@@ -158,4 +159,4 @@ class Streamer:
             self.LogQueue.put(log_item)
 
     def __del__(self):
-        flush()
+        self.flush()
