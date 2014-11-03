@@ -28,7 +28,7 @@ class Streamer:
     PubKey = ""
     SubKey = ""
     Channel = ""
-    BufferSize = 10
+    BufferSize = 20
     StreamApiBase = ""
     LogQueue = None
     DebugLevel = 0
@@ -87,16 +87,18 @@ class Streamer:
                 'clientKey': client_key
             }
 
-            def ___ship(retry_attempts):
+            def ___ship(retry_attempts, wait=0):
                 if (retry_attempts <= 0):
                     if (self.DebugLevel >= 2):
                         raise Exception("bucket create failed")
                     else:
                         self.console_message("ISStreamer failed to create or find bucket after a number of attempts", level=0)
-
-                conn.request("POST", resource, json.dumps(body), headers)
+                        return
 
                 try:
+                    if (wait > 0):
+                        time.sleep(wait)
+                    conn.request("POST", resource, json.dumps(body), headers)
                     response = conn.getresponse()
 
                     if (response.status >= 200 and response.status < 300):
@@ -107,7 +109,7 @@ class Streamer:
                 except:
                     self.console_message("exception creating bucket on attempt {atmpt}.".format(atmpt=retry_attempts))
                     retry_attempts = retry_attempts - 1
-                    ___ship(retry_attempts)
+                    ___ship(retry_attempts, 1)
 
             ___ship(retries)
 
@@ -140,15 +142,20 @@ class Streamer:
 
         self.console_message("ship it!", level=2)
 
-        def __ship(retry_attempts):
+        def __ship(retry_attempts, wait=0):
             if (retry_attempts <= 0):
                 if (self.DebugLevel >= 2):
                     raise Exception("shipping logs failed.. network issue?")
                 else:
                     self.console_message("ISStreamer failed to ship the logs after a number of attempts", level=0)
-            conn.request('POST', resource, json.dumps(messages), headers)
+                    return
+            
             try:
+                if (wait > 0):
+                    time.sleep(wait)
+                conn.request('POST', resource, json.dumps(messages), headers)
                 response = conn.getresponse()
+
                 if (response.status >= 200 and response.status < 300):
                     self.console_message("ship success!", level=2)
                 else:
@@ -157,7 +164,7 @@ class Streamer:
             except:
                 self.console_message("exception shipping logs on attempt {atmpt}.".format(atmpt=retry_attempts))
                 retry_attempts = retry_attempts - 1
-                __ship(retry_attempts)
+                __ship(retry_attempts, 1)
 
         __ship(retries)
             
@@ -181,6 +188,7 @@ class Streamer:
             while(i > 0):
                 m = self.LogQueue.get()
                 messages.append(m)
+                print(m["log"])
                 i = i - 1
 
             self.console_message("shipping 10", level=2)
@@ -197,17 +205,17 @@ class Streamer:
             t = threading.Thread(target=__ship_ten)
             t.daemon = False
             t.start()
-        else:
-            self.console_message("queueing log item")
-            log_item = {
-                "bucketId": self.Bucket,
-                "log": value,
-                "date_time": formatted_gmTime,
-                "signal_source": signal,
-                "epoc": timeStamp,
-                "tracker_id": self.SessionId
-            }
-            self.LogQueue.put(log_item)
+    
+        self.console_message("queueing log item")
+        log_item = {
+            "bucketId": self.Bucket,
+            "log": value,
+            "date_time": formatted_gmTime,
+            "signal_source": signal,
+            "epoc": timeStamp,
+            "tracker_id": self.SessionId
+        }
+        self.LogQueue.put(log_item)
 
     def close(self):
         self.IsClosed = True
