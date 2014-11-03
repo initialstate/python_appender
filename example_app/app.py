@@ -10,6 +10,6 @@ def stress_test_loop(i):
 		logger.log("stress_test", i)
 		i = i - 1
 
-stress_test_loop(100)
+stress_test_loop(7)
 
-logger.flush()
+logger.close()

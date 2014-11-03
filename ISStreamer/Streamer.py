@@ -1,15 +1,25 @@
 # local config helper stuff
-import configutil
-import version
-# internet connectivity stuff
-import httplib
+import ISStreamer.configutil as configutil
+import ISStreamer.version as version
+import uuid
+
+# python 2 and 3 conversion support
+import sys
+if (sys.version_info < (2,7,0)):
+    sys.stderr.write("You need at least python 2.7.0 to use the ISStreamer")
+    exit(1)
+elif (sys.version_info >= (3,0)):
+    import http.client as httplib
+    import queue as Queue
+else:
+    import httplib
+    import Queue
 import json
 # time stuff
 import datetime
 import time
 # performance stuff
 import threading
-import Queue
 
 class Streamer:
     CoreApiBase = ""
@@ -22,6 +32,8 @@ class Streamer:
     StreamApiBase = ""
     LogQueue = None
     DebugLevel = 0
+    SessionId = ""
+    IsClosed = True
     def __init__(self, bucket="", client_key="", ini_file_location=None, debug_level=0):
 
         config = configutil.getConfig(ini_file_location)
@@ -44,6 +56,8 @@ class Streamer:
         self.StreamApiBase = config["stream_api_base"]
         self.set_bucket(bucket_name)
         self.DebugLevel = debug_level
+        self.SessionId = str(uuid.uuid4())
+        self.IsClosed = False
 
         self.console_message("ClientKey: {clientKey}".format(clientKey=self.ClientKey))
         self.console_message("core_api_base: {api}".format(api=self.CoreApiBase))
@@ -53,7 +67,16 @@ class Streamer:
     def set_bucket(self, new_bucket, retries=3):
 
         def __create_bucket(new_bucket, client_key):
-            conn = httplib.HTTPSConnection(self.CoreApiBase)
+            api_base = self.CoreApiBase
+            conn = None
+            if (self.CoreApiBase.startswith('https://')):
+                api_base = self.CoreApiBase[8:]
+                self.console_message("core api base domain: {domain}".format(domain=api_base), level=2)
+                conn = httplib.HTTPSConnection(api_base)
+            else:
+                api_base = self.CoreApiBase[7:]
+                self.console_message("core api base domain: {domain}".format(domain=api_base), level=2)
+                conn = httplib.HTTPConnection(api_base)
             resource = "/api/v1/buckets"
             headers = {
                 'Content-Type': 'application/json',
@@ -82,6 +105,8 @@ class Streamer:
                     retry_attempts = retry_attempts - 1
                     ___ship(retry_attempts)
 
+            ___ship(retries)
+
         self.Bucket = new_bucket
         t = threading.Thread(target=__create_bucket, args=(new_bucket, self.ClientKey))
         t.daemon = False
@@ -92,11 +117,21 @@ class Streamer:
             print(message)
 
     def ship_messages(self, messages, retries=3):
-        conn = httplib.HTTPSConnection(self.StreamApiBase)
-        resource = "/batch_logs/{ckey}".format(ckey=self.ClientKey)
+        api_base = self.StreamApiBase
+        conn = None
+        if (self.StreamApiBase.startswith('https://')):
+            api_base = self.StreamApiBase[8:]
+            self.console_message("stream api base domain: {domain}".format(domain=api_base), level=2)
+            conn = httplib.HTTPSConnection(api_base)
+        else:
+            api_base = self.StreamApiBase[7:]
+            self.console_message("stream api base domain: {domain}".format(domain=api_base), level=2)
+            conn = httplib.HTTPConnection(api_base)
+        resource = "/batch_logs"
         headers = {
             'Content-Type': 'application/json',
-            'User-Agent': 'PyStreamer v' + version.__version__
+            'User-Agent': 'PyStreamer v' + version.__version__,
+            'X-IS-ClientKey': self.ClientKey
         }
 
         self.console_message("ship it!", level=2)
@@ -161,9 +196,22 @@ class Streamer:
                 "log": value,
                 "date_time": formatted_gmTime,
                 "signal_source": signal,
-                "epoc": timeStamp
+                "epoc": timeStamp,
+                "tracker_id": self.SessionId
             }
             self.LogQueue.put(log_item)
 
-    def __del__(self):
+    def close(self):
+        self.IsClosed = True
         self.flush()
+
+    def __del__(self):
+        """Try to close/flush the cache before destruction"""
+        try:
+            if (not self.IsClosed):
+                self.flush()
+        except:
+            if (self.DebugLevel >= 2):
+                raise Exception("failed to close the buffer, make sure to explicitly call close() on the Streamer")
+            else:
+                self.console_message("failed to close the buffer, make sure to explicitly call close() on the Streamer", level=1)

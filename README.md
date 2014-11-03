@@ -51,10 +51,15 @@ After getting the ISStreamer module, usage is really simple. With the following 
 ```
 from ISStreamer.Streamer import Streamer
 
+# create a Streamer instance
 var logger = new Streamer(bucket="SomeBucketName", client_key="YourClientKey")
 
+# log some data
 logger.log("signal_test", "hi")
 logger.log("temperature", 32)
+
+# flush and close the stream
+logger.close()
 ```
 
 
@@ -74,7 +79,7 @@ logger.log("temperature", 32)
 
 ###Advanced Use
 - ####Manual `flush()`
-	You can manually flush at your own accord by calling `logger.flush()`. This will ensure that anything that has been queued locally  will get sent to Initial State's log processing servers.
+	You can manually flush at your own accord by calling `Streamer.flush()`. This will ensure that anything that has been queued locally  will get sent to Initial State's log processing servers.
 	
 - ####Bucket switching
 	When you construct a `Streamer` the constructor expects a bucket to use for the data sent via `Streamer.log(signal, value)`. The bucket is either created or appended to based on the name. If you want to switch which bucket you're appending to mid program, simply call the method `Streamer.set_bucket('some_bucket_name')` here is an example:

@@ -1,6 +1,10 @@
 def getConfig(ini_file_location=None):
     import os
-    import ConfigParser
+
+    try:
+        import configparser
+    except ImportError:
+        import ConfigParser as configparser
 
     config_file_path = ""
     config_file_exists = False
@@ -10,8 +14,8 @@ def getConfig(ini_file_location=None):
             "pkey": "pub-c-92056f77-203d-467a-ba28-c5c8695effb6",
             "skey": "sub-c-1471fc40-4e27-11e4-b332-02ee2ddab7fe",
             "channel": "log_streamer_dev",
-            "core_api_base": "dev-api.initialstate.com",
-            "stream_api_base": "groker-dev.initialstate.com"
+            "core_api_base": "https://dev-api.initialstate.com",
+            "stream_api_base": "https://groker-dev.initialstate.com"
         }
 
     if (ini_file_location != None):
@@ -35,7 +39,7 @@ def getConfig(ini_file_location=None):
             config_file_exists = True
 
     if (config_file_exists):
-        config = ConfigParser.ConfigParser()
+        config = configparser.ConfigParser()
         config.read(config_file_path)
         if (config.has_section("isstreamer.client_config")):
             if (config.has_option("isstreamer.client_config", "ClientKey")):
@@ -52,7 +56,11 @@ def getConfig(ini_file_location=None):
         if (config.has_section("isstreamer.api_config")):
             if (config.has_option("isstreamer.api_config", "core_api_base")):
                 config_return["core_api_base"] = config.get("isstreamer.api_config", "core_api_base")
+                if (not config_return["core_api_base"].startswith("https://") and not config_return["core_api_base"].startswith("http://")):
+                    raise Exception("core_api_base must start with valid http:// or https://")
             if (config.has_option("isstreamer.api_config", "stream_api_base")):
                 config_return["stream_api_base"] = config.get("isstreamer.api_config", "stream_api_base")
+                if (not config_return["stream_api_base"].startswith("https://") and not config_return["stream_api_base"].startswith("http://")):
+                    raise Exception("stream_api_base must start with valid http:// or https://")
 
     return config_return
