@@ -1,15 +1,15 @@
 from ISStreamer.Streamer import Streamer
-import time
+# import time
 
-logger = Streamer("buffer_bucket_1000-3",client_key="2wO7oCojtm2eBnZEGXehC6fC1QCepbhd", debug_level=2)
+logger = Streamer("buffer_bucket_5000-3",client_key="2wO7oCojtm2eBnZEGXehC6fC1QCepbhd", debug_level=0)
 
 
 def stress_test_loop(i):
 	while i > 0:
-		time.sleep(.01)
+		# time.sleep(.01)
 		logger.log("stress_test", i)
 		i = i - 1
 
-stress_test_loop(1000)
+stress_test_loop(5000)
 
 logger.close()

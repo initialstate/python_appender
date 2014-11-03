@@ -147,7 +147,7 @@ class Streamer:
                 if (self.DebugLevel >= 2):
                     raise Exception("shipping logs failed.. network issue?")
                 else:
-                    self.console_message("ISStreamer failed to ship the logs after a number of attempts", level=0)
+                    self.console_message("ISStreamer failed to ship the logs after a number of attempts {msgs}".format(msgs=json.dumps(messages)), level=0)
                     return
             
             try:
@@ -188,7 +188,6 @@ class Streamer:
             while(i > 0):
                 m = self.LogQueue.get()
                 messages.append(m)
-                print(m["log"])
                 i = i - 1
 
             self.console_message("shipping 10", level=2)
