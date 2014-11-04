@@ -1,6 +1,12 @@
 # local config helper stuff
-import ISStreamer.configutil as configutil
-import ISStreamer.version as version
+try:
+    import ISStreamer.configutil as configutil
+except ImportError:
+    import configutil
+try:
+    import ISStreamer.version as version
+except ImportError:
+    import version
 import uuid
 
 # python 2 and 3 conversion support

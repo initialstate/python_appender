@@ -1,9 +1,19 @@
-Python Data Streamer/Shipper
+Python Data Streamer
 ===============
 
-This is a Python module currently built for python 2.7 to stream data to the Initial State platform.
+This is a Python module currently built for python >= 2.7
 
 ##Installation
+###Using the automated script
+
+On a Unix based system: (including Raspberry Pi, Mac OS X, Ubuntu) 
+
+```
+curl -L https://www.initialstate.com/streamer/python/debian | sudo ./debian_install.sh
+```
+
+
+###Using Package Management
 The package is hosted in PyPI under the package name [ISStreamer](https://pypi.python.org/pypi/ISStreamer).
 
 ####If you don't have `pip`:
