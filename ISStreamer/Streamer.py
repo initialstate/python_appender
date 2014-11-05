@@ -41,7 +41,6 @@ class Streamer:
     SessionId = ""
     IsClosed = True
     def __init__(self, bucket="", client_key="", ini_file_location=None, debug_level=0):
-
         config = configutil.getConfig(ini_file_location)
 
         if (config == None and bucket=="" and client_key == ""):
@@ -62,7 +61,6 @@ class Streamer:
         self.StreamApiBase = config["stream_api_base"]
         self.set_bucket(bucket_name)
         self.DebugLevel = debug_level
-        self.SessionId = str(uuid.uuid4())
         self.IsClosed = False
 
         self.console_message("ClientKey: {clientKey}".format(clientKey=self.ClientKey))
@@ -72,7 +70,7 @@ class Streamer:
 
     def set_bucket(self, new_bucket, retries=3):
 
-        def __create_bucket(new_bucket, client_key):
+        def __create_bucket(new_bucket, bucket_id, client_key):
             api_base = self.CoreApiBase
             conn = None
             if (self.CoreApiBase.startswith('https://')):
@@ -89,7 +87,8 @@ class Streamer:
                 'User-Agent': 'PyStreamer v' + version.__version__
             }
             body = {
-                'bucketId': new_bucket,
+                'bucketId': bucket_id,
+                'bucketName': new_bucket,
                 'clientKey': client_key
             }
 
@@ -119,8 +118,9 @@ class Streamer:
 
             ___ship(retries)
 
+        self.SessionId = str(uuid.uuid4())
         self.Bucket = new_bucket
-        t = threading.Thread(target=__create_bucket, args=(new_bucket, self.ClientKey))
+        t = threading.Thread(target=__create_bucket, args=(new_bucket, self.SessionId, self.ClientKey))
         t.daemon = False
         t.start()
 
