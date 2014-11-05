@@ -213,12 +213,11 @@ class Streamer:
     
         self.console_message("queueing log item")
         log_item = {
-            "bucketId": self.Bucket,
-            "log": value,
-            "date_time": formatted_gmTime,
-            "signal_source": signal,
-            "epoc": timeStamp,
-            "tracker_id": self.SessionId
+            "v": value,
+            "dt": formatted_gmTime,
+            "sn": signal,
+            "e": timeStamp,
+            "tid": self.SessionId
         }
         self.LogQueue.put(log_item)
 
