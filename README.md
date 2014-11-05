@@ -9,7 +9,7 @@ This is a Python module currently built for python >= 2.7
 On a Unix based system: (including Raspberry Pi, Mac OS X, Ubuntu) 
 
 ```
-curl -sSL http://cdn.initialstate.com/debian_install.sh -o - | sudo sh
+\curl -sSL http://cdn.initialstate.com/debian_install.sh -o - | sudo sh
 ```
 
 
