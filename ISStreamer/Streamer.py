@@ -214,6 +214,7 @@ class Streamer:
         self.console_message("queueing log item")
         log_item = {
             "v": value,
+            "b": self.Bucket,
             "dt": formatted_gmTime,
             "sn": signal,
             "e": timeStamp,
