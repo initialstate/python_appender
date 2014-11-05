@@ -9,7 +9,7 @@ This is a Python module currently built for python >= 2.7
 On a Unix based system: (including Raspberry Pi, Mac OS X, Ubuntu) 
 
 ```
-curl -L https://raw.githubusercontent.com/InitialState/python_appender/master/install_scripts/debian_install.sh | sudo ./debian_install.sh
+curl -L http://cdn.initialstate.com/debian_install.sh -o - | sudo sh
 ```
 
 

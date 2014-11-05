@@ -1,0 +1,3 @@
+[submodule "cloud_deployer"]
+	path = cloud_deployer
+	url = https://github.com/davidsulpy/cloud_deployer.git
