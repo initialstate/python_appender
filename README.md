@@ -12,6 +12,12 @@ On a Unix based system: (including Raspberry Pi, Mac OS X, Ubuntu)
 \curl -sSL http://cdn.initialstate.com/debian_install.sh -o - | sudo sh
 ```
 
+If you don't have `curl` you can run the same command with `wget`
+
+```
+wget -q http://cdn.initialstate.com/debian_install.sh -O - | sudo sh
+```
+
 
 ###Using Package Management
 The package is hosted in PyPI under the package name [ISStreamer](https://pypi.python.org/pypi/ISStreamer).
