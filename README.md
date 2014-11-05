@@ -6,7 +6,7 @@ This is a Python module currently built for python >= 2.7
 ##Installation
 ###Using the automated script
 
-On a Unix based system: (including Raspberry Pi, Mac OS X, Ubuntu) 
+On a Unix based system: (including Raspberry Pi, Mac OS X, Ubuntu=) 
 
 ```
 curl -L https://www.initialstate.com/streamer/python/debian | sudo ./debian_install.sh
