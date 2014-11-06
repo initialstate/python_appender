@@ -11,7 +11,7 @@ function check_for_easy_install {
         echo "easy_install not found, installing now..."
 
         if hash apt-get 2>/dev/null; then
-        	apt-get install python-setuptools		
+        	apt-get -y install python-setuptools		
         else
         	echo "no apt-get, using curl..."
         	curl https://bootstrap.pypa.io/ez_setup.py -o - | python
