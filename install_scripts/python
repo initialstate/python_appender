@@ -2,7 +2,6 @@
 
 echo "Beginning ISStreamer Python Easy Installation!"
 
-
 function check_for_easy_install {
     if hash easy_install 2>/dev/null; then
         easy_install_version=$(easy_install --version)
@@ -11,10 +10,18 @@ function check_for_easy_install {
         echo "easy_install not found, installing now..."
 
         if hash apt-get 2>/dev/null; then
-        	apt-get -y install python-setuptools		
+        	if [ $1 = '-v' ]; then
+        		apt-get -y install python-setuptools
+        	else
+				apt-get -y install python-setuptools > /dev/null
+        	fi
         else
         	echo "no apt-get, using curl..."
-        	curl https://bootstrap.pypa.io/ez_setup.py -o - | python
+        	if [ $1 = '-v' ]; then
+        		curl https://bootstrap.pypa.io/ez_setup.py -o - | python
+        	else
+        		curl https://bootstrap.pypa.io/ez_setup.py -o - | python > /dev/null
+        	fi
         fi
     fi
 }
@@ -25,7 +32,11 @@ function check_for_pip {
 		echo "Found pip: $pip_version"
 	else
 		echo "pip not found, installing now..."
-		easy_install pip
+		if [ $1 = '-v' ]; then
+			easy_install pip
+		else
+			easy_install pip > /dev/null
+		fi
 	fi
 }
 

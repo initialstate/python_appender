@@ -9,13 +9,13 @@ This is a Python module currently built for python >= 2.7
 On a Unix based system: (including Raspberry Pi, Mac OS X, Ubuntu) 
 
 ```
-\curl -sSL http://cdn.initialstate.com/debian_install.sh -o - | sudo bash
+\curl -sSL https://get.initialstate.com/python -o - | sudo bash
 ```
 
 If you don't have `curl` you can run the same command with `wget`
 
 ```
-wget -q http://cdn.initialstate.com/debian_install.sh -O - | sudo bash
+wget -q https://get.initialstate.com/python -O - | sudo bash
 ```
 
 

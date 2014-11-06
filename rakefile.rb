@@ -11,7 +11,7 @@ end
 
 ACCESS_KEY_ID = ENV['isakid'] || ENV["initialstate.access_key_id"]
 SECRET_ACCESS_KEY = ENV['issak'] || ENV["initialstate.secret_access_key"]
-
+ENVIRONMENT = ENV["env"] || 'dev'
 
 task :default => [:push_to_s3] do
 	puts "Finished!"
@@ -27,6 +27,9 @@ task :push_to_s3 => [:get_cloud_deployer] do
 		:access_key_id => ACCESS_KEY_ID,
 		:secret_access_key => SECRET_ACCESS_KEY
 		})
-	asset_bucket = "initialstate-web-cdn"
+	asset_bucket = "get-dev.initialstate.com"
+	if (ENVIRONMENT == 'prod')
+		asset_bucket = "get.initialstate.com"
+	end
 	@s3helper.put_asset_in_s3("install_scripts/*", asset_bucket, "", "text/plain")
 end
