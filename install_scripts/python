@@ -1,6 +1,7 @@
 #!/bin/bash
 
 echo "Beginning ISStreamer Python Easy Installation!"
+echo "This may take a couple minutes to install, grab some coffee :)"
 
 function check_for_easy_install {
     if hash easy_install 2>/dev/null; then
@@ -51,7 +52,32 @@ function check_for_isstreamer {
 	fi
 }
 
+
+function setup_first_script {
+	echo -n "Do you want automagically get a script to start? [y/N] "
+	read is_wanted < /dev/tty
+
+	if [[ $is_wanted -eq 'y' || $is_wanted -eq 'Y' ]]; then
+		echo -n "Enter www.initialstate.com user email: "
+		read username < /dev/tty 
+		echo -n "Enter www.initialstate.com password [input hidden]: "
+		read -s password < /dev/tty
+		echo ""
+		echo "Where do you want to save the example? [default: ~/is_example.py]: "
+		read example_location < /dev/tty
+
+		if [ -z "$example_location" ]; then
+			example_location="~/is_example.py"
+		fi
+
+		curl -X POST "https://dev-api.initialstate.com/api/v1/python/jump_start" -H "X-USER: $username" -H "X-SEC: $password" -H "Accept-Content: text/plain" -m 30 -d "" -s >> $example_location
+	fi
+	
+	echo "All done!"
+}
+
 check_for_easy_install
 check_for_pip
 check_for_isstreamer
 
+setup_first_script

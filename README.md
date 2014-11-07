@@ -12,10 +12,14 @@ On a Unix based system: (including Raspberry Pi, Mac OS X, Ubuntu)
 \curl -sSL https://get.initialstate.com/python -o - | sudo bash
 ```
 
-If you don't have `curl` you can run the same command with `wget`
+If you don't have `curl` you should get it
 
 ```
-wget -q https://get.initialstate.com/python -O - | sudo bash
+sudo apt-get install curl
+```
+
+```
+sudo yum install curl
 ```
 
 

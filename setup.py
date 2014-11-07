@@ -27,10 +27,6 @@ setup(
 	keywords = "logger,logstream,initial state",
 	url = "https://www.initialstate.com",
 	
-	# install_requires=[
-	# 	"pubnub"
-	# ],
-
 	classifiers=[
 		"Development Status :: 3 - Alpha",
 		"Topic :: Utilities",
