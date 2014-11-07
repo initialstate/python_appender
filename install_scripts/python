@@ -2,6 +2,8 @@
 
 echo "Beginning ISStreamer Python Easy Installation!"
 echo "This may take a couple minutes to install, grab some coffee :)"
+echo "But don't forget to come back, I'll have questions later!"
+echo ""
 
 function check_for_easy_install {
     if hash easy_install 2>/dev/null; then
@@ -65,7 +67,7 @@ function download_script {
 		example_location="./is_example.py"
 	fi
 
-	python_example=$(curl -X POST "https://dev-api.initialstate.com/api/v1/python/jump_start" -H "X-USER: $username" -H "X-SEC: $password" -H "Accept-Content: text/plain" -m 30 -d "" -s)
+	python_example=$(curl -X POST "https://initialstate.com/api/v1/python/jump_start" -H "X-USER: $username" -H "X-SEC: $password" -H "Accept-Content: text/plain" -m 30 -d "" -s)
 
 	if [[ $python_example -eq "INVALID_CREDENTIALS" ]]; then
 		echo "invalid credentials, let's try that again!"
