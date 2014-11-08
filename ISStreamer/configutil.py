@@ -11,9 +11,6 @@ def getConfig(ini_file_location=None):
     config_return = {
             "bucket": "",
             "clientKey": "",
-            "pkey": "pub-c-92056f77-203d-467a-ba28-c5c8695effb6",
-            "skey": "sub-c-1471fc40-4e27-11e4-b332-02ee2ddab7fe",
-            "channel": "log_streamer_dev",
             "core_api_base": "https://api.initialstate.com",
             "stream_api_base": "https://groker.initialstate.com"
         }
@@ -46,13 +43,6 @@ def getConfig(ini_file_location=None):
                 config_return["clientKey"] = config.get("isstreamer.client_config", "ClientKey")
             if (config.has_option("isstreamer.client_config", "DefaultBucket")):
                 config_return["bucket"] = config.get("isstreamer.client_config", "DefaultBucket")
-        if (config.has_section("isstreamer.api_keys")):
-            if (config.has_option("isstreamer.api_keys", "pkey")):
-                config_return["pkey"] = config.get("isstreamer.api_keys", "pkey")
-            if (config.has_option("isstreamer.api_keys", "skey")):
-                config_return["skey"] = config.get("isstreamer.api_keys", "skey")
-            if (config.has_option("isstreamer.api_keys", "channel")):
-                config_return["channel"] = config.get("isstreamer.api_keys", "channel")
         if (config.has_section("isstreamer.api_config")):
             if (config.has_option("isstreamer.api_config", "core_api_base")):
                 config_return["core_api_base"] = config.get("isstreamer.api_config", "core_api_base")
