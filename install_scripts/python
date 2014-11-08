@@ -73,7 +73,7 @@ function download_script {
 		echo "invalid credentials, let's try that again!"
 		download_script
 	else
-		echo $python_example > "$example_location"
+		echo "$python_example" > "$example_location"
 	fi
 }
 
