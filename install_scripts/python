@@ -67,7 +67,7 @@ function download_script {
 		example_location="./is_example.py"
 	fi
 
-	python_example=$(curl -X POST "https://api.initialstate.com/api/v1/python/jump_start" -H "X-USER: $username" -H "X-SEC: $password" -H "Accept-Content: text/plain" -m 30 -d "" -s)
+	python_example=$(curl -X POST "https://api.initialstate.com/api/v1/python/jump_start" -H "X-USER: $username" -H "X-SEC: $password" -H "Accept-Content: text/plain" -H "X-BUCKET: $bucket" -m 30 -d "" -s)
 	
 	if [ "$python_example" = "INVALID_CREDENTIALS" ]; then
 		echo "invalid credentials, let's try that again!"
