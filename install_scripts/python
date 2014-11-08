@@ -60,8 +60,6 @@ function download_script {
 	echo -n "Enter www.initialstate.com password [input hidden]: "
 	read -s password < /dev/tty
 	echo ""
-	echo "Where do you want to save the example? [default: ./is_example.py]: "
-	read example_location < /dev/tty
 
 	if [ -z "$example_location" ]; then
 		example_location="./is_example.py"
@@ -82,6 +80,11 @@ function setup_first_script {
 	read is_wanted < /dev/tty
 
 	if [[ $is_wanted -eq 'y' || $is_wanted -eq 'Y' ]]; then
+		echo "Where do you want to save the example? [default: ./is_example.py]: "
+		read example_location < /dev/tty
+
+		echo "What do you want to name this project? "
+		read bucket < /dev/tty
 		download_script
 	fi
 	
