@@ -35,7 +35,8 @@ task :push_to_s3 => [:get_cloud_deployer] do
 	@s3helper.put_asset_in_s3("install_scripts/python", asset_bucket, "", "text/plain")
 end
 
-task :invalidate_cloudfront => do
+task :invalidate_cloudfront do
+	puts "beginning cache invalidation"
 	cf_distro_id = 'E1M7UGJXW11IYK'
 	if (ENVIRONMENT == 'prod')
 		cf_distro_id = 'EXNTGBZ947DQ1'
@@ -48,4 +49,6 @@ task :invalidate_cloudfront => do
 		})
 
 	@cloudFrontHelper.invalidate("/python")
+
+	puts "request submitted!"
 end
