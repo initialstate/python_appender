@@ -65,7 +65,7 @@ function download_script {
 		example_location="./is_example.py"
 	fi
 
-	python_example=$(curl -X POST "https://api.initialstate.com/api/v1/python/jump_start" -H "X-USER: $username" -H "X-SEC: $password" -H "Accept-Content: text/plain" -H "X-BUCKET: $bucket" -m 30 -d "" -s)
+	python_example=$(curl -X POST "https://dev-api.initialstate.com/api/v1/python/example" -H "X-USER: $username" -H "X-SEC: $password" -H "Accept-Content: text/plain" -m 30 -d "" -s)
 	
 	if [ "$python_example" = "INVALID_CREDENTIALS" ]; then
 		echo "invalid credentials, let's try that again!"
@@ -76,16 +76,12 @@ function download_script {
 }
 
 function setup_first_script {
-	echo -n "Do you want automagically get a script to start? [y/N] "
+	echo -n "Do you want automagically get an example script? [y/N] "
 	read is_wanted < /dev/tty
 
 	if [[ $is_wanted -eq 'y' || $is_wanted -eq 'Y' ]]; then
 		echo "Where do you want to save the example? [default: ./is_example.py]: "
 		read example_location < /dev/tty
-
-		echo "What do you want to name this project? "
-		read bucket < /dev/tty
-		download_script
 	fi
 	
 	echo "All done!"
