@@ -14,13 +14,21 @@ SECRET_ACCESS_KEY = ENV['issak'] || ENV["initialstate.secret_access_key"]
 ENVIRONMENT = ENV["env"] || 'dev'
 VERSION = `git describe --tags --long`
 
-task :default => [:push_to_s3, :invalidate_cloudfront] do
+task :default => [:release_version, :push_to_s3, :invalidate_cloudfront] do
 	puts "Finished!"
 end
 
 task :get_cloud_deployer do
 	update_submodules()
 	require_relative 'cloud_deployer/cloud_deploy'
+end
+
+task :release_version do
+	begin
+		`fullrelease --no-input`
+	rescue
+		puts "error: perhaps zest.releaser isn't installed, install and try again"
+	end
 end
 
 task :push_to_s3 => [:get_cloud_deployer] do
