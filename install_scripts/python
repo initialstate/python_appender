@@ -72,6 +72,8 @@ function download_script {
 		download_script
 	else
 		echo "$python_example" > "$example_location"
+		loggedin_user=$(logname)
+		chown $loggedin_user "$example_location"
 	fi
 }
 
