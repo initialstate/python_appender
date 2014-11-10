@@ -82,6 +82,8 @@ function setup_first_script {
 	if [[ $is_wanted -eq 'y' || $is_wanted -eq 'Y' ]]; then
 		echo "Where do you want to save the example? [default: ./is_example.py]: "
 		read example_location < /dev/tty
+
+		download_script
 	fi
 	
 	echo "All done!"
