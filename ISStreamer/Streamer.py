@@ -16,16 +16,15 @@ if (sys.version_info < (2,7,0)):
     exit(1)
 elif (sys.version_info >= (3,0)):
     import http.client as httplib
-    import queue as Queue
 else:
     import httplib
-    import Queue
 import json
 # time stuff
 import datetime
 import time
 # performance stuff
 import threading
+import collections
 
 class Streamer:
     CoreApiBase = ""
@@ -34,7 +33,8 @@ class Streamer:
     PubKey = ""
     SubKey = ""
     Channel = ""
-    BufferSize = 20
+    BufferSize = 10
+    LogIterations = 0
     StreamApiBase = ""
     LogQueue = None
     DebugLevel = 0
@@ -56,7 +56,10 @@ class Streamer:
             self.ClientKey = client_key
 
 
-        self.LogQueue = Queue.Queue(self.BufferSize)
+        #self.LogQueue = Queue.Queue(self.BufferSize)
+
+        self.LogQueue = collections.deque()
+
         self.CoreApiBase = config["core_api_base"]
         self.StreamApiBase = config["stream_api_base"]
         self.set_bucket(bucket_name)
@@ -133,11 +136,11 @@ class Streamer:
         conn = None
         if (self.StreamApiBase.startswith('https://')):
             api_base = self.StreamApiBase[8:]
-            self.console_message("stream api base domain: {domain}".format(domain=api_base), level=2)
+            self.console_message("ship messages: stream api base domain: {domain}".format(domain=api_base), level=2)
             conn = httplib.HTTPSConnection(api_base)
         else:
             api_base = self.StreamApiBase[7:]
-            self.console_message("stream api base domain: {domain}".format(domain=api_base), level=2)
+            self.console_message("ship messages: stream api base domain: {domain}".format(domain=api_base), level=2)
             conn = httplib.HTTPConnection(api_base)
         resource = "/batch_logs"
         headers = {
@@ -146,14 +149,13 @@ class Streamer:
             'X-IS-ClientKey': self.ClientKey
         }
 
-        self.console_message("ship it!", level=2)
-
         def __ship(retry_attempts, wait=0):
+            self.console_message("ship: beginning message ship!", level=2)
             if (retry_attempts <= 0):
                 if (self.DebugLevel >= 2):
                     raise Exception("shipping logs failed.. network issue?")
                 else:
-                    self.console_message("ISStreamer failed to ship the logs after a number of attempts {msgs}".format(msgs=json.dumps(messages)), level=0)
+                    self.console_message("ship: ISStreamer failed to ship the logs after a number of attempts {msgs}".format(msgs=json.dumps(messages)), level=0)
                     return
             
             try:
@@ -163,12 +165,12 @@ class Streamer:
                 response = conn.getresponse()
 
                 if (response.status >= 200 and response.status < 300):
-                    self.console_message("ship success!", level=2)
+                    self.console_message("ship: success!", level=2)
                 else:
-                    self.console_message("ship failed on attempt {atmpt} (StatusCode: {sc}; Reason: {r})".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
+                    self.console_message("ship: failed on attempt {atmpt} (StatusCode: {sc}; Reason: {r})".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
                     raise Exception("ship exception")
             except:
-                self.console_message("exception shipping logs on attempt {atmpt}.".format(atmpt=retry_attempts))
+                self.console_message("ship: exception shipping logs on attempt {atmpt}.".format(atmpt=retry_attempts))
                 retry_attempts = retry_attempts - 1
                 __ship(retry_attempts, 1)
 
@@ -177,41 +179,51 @@ class Streamer:
 
     def flush(self):
         messages = []
-        self.console_message("checking queue", level=2)
-        while not self.LogQueue.empty():
-            m = self.LogQueue.get()
-            messages.append(m)
+        self.console_message("flush: checking queue", level=2)
+        isEmpty = False
+        while not isEmpty:
+            try:
+                m = self.LogQueue.popleft()
+                messages.append(m)
+            except IndexError:
+                isEmpty = True
+                self.console_message("flush: queue empty...", level=2)
         if len(messages) > 0:
-            self.console_message("queue not empty, flushing", level=2)
+            self.console_message("flush: queue not empty, shipping", level=2)
             self.ship_messages(messages)
-        self.console_message("finished flushing queue", level=2)
+        self.console_message("flush: finished flushing queue", level=2)
 
 
     def log(self, signal, value):
         def __ship_ten():
-            i = 10
+            i = self.BufferSize
             messages = []
             while(i > 0):
-                m = self.LogQueue.get()
-                messages.append(m)
+                try:
+                    m = self.LogQueue.popleft()
+                    messages.append(m)
+                except IndexError:
+                    i = 0
+                    self.console_message("ship10: queue empty for now, less than 10")
                 i = i - 1
 
-            self.console_message("shipping 10", level=2)
+            self.console_message("ship10: shipping", level=2)
             self.ship_messages(messages)
-            self.console_message("finished shipping 10", level=2)
+            self.console_message("ship10: finished shipping", level=2)
 
 
         timeStamp = time.time()
         gmtime = datetime.datetime.fromtimestamp(timeStamp)
         formatted_gmTime = gmtime.strftime('%Y-%m-%d %H:%M:%S.%f')
         self.console_message("{time}: {signal} {value}".format(signal=signal, value=value, time=formatted_gmTime))
-        if (self.LogQueue.qsize() >= 10):
-            self.console_message("queue size greater than 10, shipping!")
+        
+        if (len(self.LogQueue) >= self.BufferSize):
+            self.console_message("log: queue size approximately at or greater than buffer size, shipping!", level=10)
             t = threading.Thread(target=__ship_ten)
             t.daemon = False
             t.start()
     
-        self.console_message("queueing log item")
+        self.console_message("log: queueing log item", level=2)
         log_item = {
             "v": value,
             "b": self.Bucket,
@@ -220,7 +232,7 @@ class Streamer:
             "e": timeStamp,
             "tid": self.SessionId
         }
-        self.LogQueue.put(log_item)
+        self.LogQueue.append(log_item)
 
     def close(self):
         self.IsClosed = True

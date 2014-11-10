@@ -11,8 +11,8 @@ def getConfig(ini_file_location=None):
     config_return = {
             "bucket": "",
             "clientKey": "",
-            "core_api_base": "https://api.initialstate.com",
-            "stream_api_base": "https://groker.initialstate.com"
+            "core_api_base": "https://dev-api.initialstate.com",
+            "stream_api_base": "https://groker-dev.initialstate.com"
         }
 
     if (ini_file_location != None):
