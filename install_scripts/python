@@ -79,7 +79,7 @@ function setup_first_script {
 	echo -n "Do you want automagically get an example script? [y/N] "
 	read is_wanted < /dev/tty
 
-	if [[ $is_wanted -eq 'y' || $is_wanted -eq 'Y' ]]; then
+	if [ "$is_wanted" = "y" ] || [ "$is_wanted" = "Y" ]; then
 		echo "Where do you want to save the example? [default: ./is_example.py]: "
 		read example_location < /dev/tty
 
