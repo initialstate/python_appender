@@ -31,5 +31,18 @@ task :push_to_s3 => [:get_cloud_deployer] do
 	if (ENVIRONMENT == 'prod')
 		asset_bucket = "get.initialstate.com"
 	end
-	@s3helper.put_asset_in_s3("install_scripts/*", asset_bucket, "", "text/plain")
+	@s3helper.put_asset_in_s3("install_scripts/python", asset_bucket, "", "text/plain")
+
+	cf_distro_id = 'E1M7UGJXW11IYK'
+	if (ENVIRONMENT == 'prod')
+		cf_distro_id = 'EXNTGBZ947DQ1'
+	end
+	@cloudFrontHelper = CloudDeploy::CloudFrontHelper.new({
+		:access_key_id => ACCESS_KEY_ID,
+		:secret_access_key => SECRET_ACCESS_KEY,
+		:cf_distro_id = cf_distro_id,
+		:code_version => `git describe --tags --long`
+		})
+
+	@cloudFrontHelper.invalidate("python")
 end
