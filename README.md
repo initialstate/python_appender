@@ -72,7 +72,7 @@ After getting the ISStreamer module, usage is really simple. With the following 
 from ISStreamer.Streamer import Streamer
 
 # create a Streamer instance
-streamer = Streamer(bucket="SomeBucketName", client_key="YourClientKey")
+streamer = Streamer(bucket="Some Bucket Name", client_key="YourClientKey")
 
 # log some data
 streamer.log("signal_test", "hi")
