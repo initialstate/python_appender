@@ -1,4 +1,4 @@
-**0.0.22 (2014-11-18)**
+0.0.22 (2014-11-20)
 
 * install script added check for pip version for `--pre` flag. added ability to specify wether or not to get pre-released streamer
 * added ability to override epoch timestamp via optional `epoch` parameter on `Streamer.log(signal, value[, epoch])`
