@@ -116,18 +116,27 @@ streamer.close()
 - ####Manual `flush()`
 	You can manually flush at your own accord by calling `Streamer.flush()`. This will ensure that anything that has been queued locally  will get sent to Initial State's log processing servers.
 	
+- ####Changing buffer size
+	You can override the default log buffer item size by passing the optional `buffer_size` parameter into the Streamer constructor. Here is an example:
+
+	```python
+	streamer = Streamer(bucket="Hi!", client_key="YourClientKey", buffer_size=20)
+	```
+
+	In this example, the `buffer_size` is being increased to 20 from the default, 10. The decision to override this value should be based on how many log statements you make in a loop before sleeping. You can typically play around with this number help tune performance of the Streamer.
+
 - ####Creating a new bucket
 	When you construct a `Streamer` the constructor expects a name that it will assign to a new bucket that it will use as the context for `Streamer.log(signal, value)`. The bucket is created new every time the `Streamer` is constructed. If you want to switch which to a new bucket, because say you've started a new session or run, simply call `Streamer.new_bucket('some_bucket_name')` here is an example:
 	
 	```python
-	streamer = Streamer(bucket="starting_bucket", client_key="YourClientKey")
+	streamer = Streamer(bucket="Starting Bucket", client_key="YourClientKey")
 	
 	streamer.log("signal1", "starting")
-	streamer.new_bucket("new_bucket")
+	streamer.set_bucket("New Bucket")
 	streamer.log("signal1", "starting")
 	```  
 
-	In this example, you will get a signal1=starting in two different buckets: "starting_bucket" and "new_bucekt".
+	In this example, you will get a signal1=starting in two different buckets: "Starting Bucket" and "New Bucket".
 
 
 ###Troubleshooting
