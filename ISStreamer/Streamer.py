@@ -197,6 +197,31 @@ class Streamer:
         self.console_message("flush: finished flushing queue", level=2)
 
 
+    def log_object(self, obj, signal_prefix="", epoch=None):
+        if (epoch == None):
+            epoch = time.time()
+
+        if (signal_prefix == ""):
+            signal_prefix = str(type(obj).__name__)
+
+        if (type(obj).__name__ == 'list'):
+            i = 0
+            for val in obj:
+                signal_name = "{}_{}".format(signal_prefix, i)
+                self.log(signal_name, val, epoch=epoch)
+                i += 1
+        elif (type(obj).__name__ == 'dict'):
+            for key in obj:
+                signal_name = "{}_{}".format(signal_prefix, key)
+                self.log(signal_name, obj[key], epoch=epoch)
+        else:
+            for attr in dir(obj):
+                if not isinstance(getattr(type(obj), attr, None), property):
+                    continue
+                signal_name = "{}_{}".format(signal_prefix, attr)
+                self.log(signal_name, getattr(obj, attr), epoch=epoch)
+
+
     def log(self, signal, value, epoch=None):
         def __ship_ten():
             i = self.BufferSize

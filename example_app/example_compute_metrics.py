@@ -1,29 +1,32 @@
 import psutil
 import time
 from ISStreamer.Streamer import Streamer
-streamer = Streamer(bucket="Perf 1ms sampling; buffer 20; epoch override", buffer_size=20)
+streamer = Streamer(bucket="Perf 10ms sampling; buffer 20; epoch override", buffer_size=20)
 
-sample_rate_in_ms=1
+sample_rate_in_ms=10
 
 for x in range(100):
 	cur_time = time.time()
-	streamer.log("sample", x, epoch=time)
+	streamer.log("sample", x, epoch=cur_time)
+	# Get total CPU usage
+	cpu_percent = psutil.cpu_percent()
+	streamer.log("cpu_total", cpu_percent, epoch=cur_time)
+	
+	# Get individual CPU usage
 	cpu_percents = psutil.cpu_percent(percpu=True)
+	streamer.log_object(cpu_percents, signal_prefix="cpu", epoch=cur_time)
 
-	i = 1
-	for percent in cpu_percents:
-		streamer.log("cpu_{}_percent".format(i), percent, epoch=time)
-		i += 1
-
+	# Get the virtual memory usage
 	memory = psutil.virtual_memory()
-	streamer.log("virtual_memory_%", memory.percent, epoch=time)
-	streamer.log("virtual_memory_total", memory.total, epoch=time)
-	streamer.log("virtual_memory_avail", memory.available, epoch=time)
-	streamer.log("virtual_memory_used", memory.used, epoch=time)
-	streamer.log("virtual_memory_free", memory.free, epoch=time)
-	streamer.log("virtual_memory_active", memory.active, epoch=time)
-	streamer.log("virtual_memory_inactive", memory.inactive, epoch=time)
-	streamer.log("virtual_memory_wired", memory.wired, epoch=time)
+	streamer.log_object(memory, epoch=cur_time)
+	
+	# Get the swap memory usage
+	swap = psutil.swap_memory()
+	streamer.log_object(swap, epoch=cur_time)
+
+	# Get the network usage
+	network = psutil.net_io_counters()
+	streamer.log_object(network, epoch=cur_time)
 
 	time.sleep(sample_rate_in_ms/1000)
 

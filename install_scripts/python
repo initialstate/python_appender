@@ -47,7 +47,7 @@ function check_for_pip {
 		if [ -z "$ISSTREAMER_PRE" ]; then
 			ISSTREAMER_PRE=0
 		fi
-		
+
 		if (( "$ISSTREAMER_PRE" == "1" && "$pip_major_version" >= "1" && "$pip_minor_version" >= "4" ))
 		then
 			use_pre_flag=1
@@ -68,7 +68,7 @@ function check_for_pip {
 }
 
 function check_for_isstreamer {
-	isstreamer=$(pip list | grep ISStreamer)
+	isstreamer=$(pip freeze | grep ISStreamer)
 	if [ -z "$isstreamer" ]; then
 		echo "ISStreamer not found, installing..."
 
