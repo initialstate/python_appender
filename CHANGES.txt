@@ -1,3 +1,9 @@
+0.0.23 (unreleased)
+-------------------
+
+- Nothing changed yet.
+
+
 0.0.22 (2014-11-21)
 
 * feature: added log_object method to allow automatically logging flat objects attributes, dicts, and lists
