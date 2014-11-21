@@ -28,7 +28,7 @@ setup(
 	url = "https://www.initialstate.com",
 	
 	classifiers=[
-		"Development Status :: 3 - Alpha",
+		"Development Status :: 5 - Production/Stable",
 		"Topic :: Utilities",
 		"License :: OSI Approved :: MIT License"
 	]
