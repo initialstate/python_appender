@@ -1,4 +1,4 @@
-0.0.22 (2014-11-20)
+0.0.22 (2014-11-21)
 
 * feature: added log_object method to allow automatically logging flat objects attributes, dicts, and lists
 * feature: improved example_compute_metrics.py
