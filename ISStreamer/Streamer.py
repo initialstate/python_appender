@@ -197,11 +197,11 @@ class Streamer:
         self.console_message("flush: finished flushing queue", level=2)
 
 
-    def log_object(self, obj, signal_prefix="", epoch=None):
+    def log_object(self, obj, signal_prefix=None, epoch=None):
         if (epoch == None):
             epoch = time.time()
 
-        if (signal_prefix == ""):
+        if (signal_prefix == None):
             signal_prefix = str(type(obj).__name__)
 
         if (type(obj).__name__ == 'list'):
