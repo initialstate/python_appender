@@ -33,6 +33,17 @@ function check_for_pip {
 	if hash pip 2>/dev/null; then
 		pip_version=$(pip --version)
 		echo "Found pip: $pip_version"
+		pip_version_array=(${pip_version//" "/ })
+		pip_version_num=${pip_version_array[1]}
+		pip_version_num_array=(${pip_version_num//./ })
+		pip_major_version=${pip_version_num_array[0]}
+		pip_minor=${pip_version_num_array[1]}
+		pip_minor_version_array=(${pip_minor//"rc"/ })
+		pip_minor_version=${pip_minor_version_array[0]}
+
+		echo "pip major version: $pip_major_version"
+		echo "pip minor version: $pip_minor_version"
+
 	else
 		echo "pip not found, installing now..."
 		if [[ $1 -eq '-v' ]]; then
@@ -47,10 +58,12 @@ function check_for_isstreamer {
 	isstreamer=$(pip list | grep ISStreamer)
 	if [ -z "$isstreamer" ]; then
 		echo "ISStreamer not found, installing..."
-		pip install ISStreamer --pre
+
+		pip install ISStreamer
 	else
 		echo "ISStreamer found, updating..."
-		pip install --upgrade ISStreamer --pre
+		
+		pip install --upgrade ISStreamer
 	fi
 }
 
@@ -91,8 +104,8 @@ function setup_first_script {
 	echo "All done!"
 }
 
-check_for_easy_install
-check_for_pip
-check_for_isstreamer
+sudo check_for_easy_install
+sudo check_for_pip
+sudo check_for_isstreamer
 
 setup_first_script
