@@ -104,8 +104,8 @@ function setup_first_script {
 	echo "All done!"
 }
 
-sudo check_for_easy_install
-sudo check_for_pip
-sudo check_for_isstreamer
+check_for_easy_install
+check_for_pip
+check_for_isstreamer
 
 setup_first_script
