@@ -84,7 +84,7 @@ function download_script {
 		echo "invalid credentials, let's try that again!"
 		download_script
 	else
-		echo "$python_example" | sudo -u $SUDO_USER tee "$example_location"
+		echo "$python_example" | sudo -u $SUDO_USER tee "$example_location" > /dev/null
 	fi
 }
 
