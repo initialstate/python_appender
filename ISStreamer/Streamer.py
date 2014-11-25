@@ -40,7 +40,7 @@ class Streamer:
     DebugLevel = 0
     SessionId = ""
     IsClosed = True
-    def __init__(self, bucket="", client_key="", ini_file_location=None, debug_level=0):
+    def __init__(self, bucket="", client_key="", ini_file_location=None, debug_level=0, buffer_size=10):
         config = configutil.getConfig(ini_file_location)
 
         if (config == None and bucket=="" and client_key == ""):
@@ -57,7 +57,7 @@ class Streamer:
 
 
         #self.LogQueue = Queue.Queue(self.BufferSize)
-
+        self.BufferSize = buffer_size
         self.LogQueue = collections.deque()
 
         self.CoreApiBase = config["core_api_base"]
@@ -111,6 +111,9 @@ class Streamer:
 
                     if (response.status >= 200 and response.status < 300):
                         self.console_message("bucket created successfully!", level=2)
+                    elif (response.status == 401 or response.status == 403):
+                        self.console_message("ClientKey not authorized")
+                        raise Exception("ClientKey not authorized")
                     else:
                         self.console_message("ISStreamer failed to setup the bucket on attempt {atmpt}. StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
                         raise Exception("ship exception")
@@ -194,7 +197,32 @@ class Streamer:
         self.console_message("flush: finished flushing queue", level=2)
 
 
-    def log(self, signal, value):
+    def log_object(self, obj, signal_prefix=None, epoch=None):
+        if (epoch == None):
+            epoch = time.time()
+
+        if (signal_prefix == None):
+            signal_prefix = str(type(obj).__name__)
+
+        if (type(obj).__name__ == 'list'):
+            i = 0
+            for val in obj:
+                signal_name = "{}_{}".format(signal_prefix, i)
+                self.log(signal_name, val, epoch=epoch)
+                i += 1
+        elif (type(obj).__name__ == 'dict'):
+            for key in obj:
+                signal_name = "{}_{}".format(signal_prefix, key)
+                self.log(signal_name, obj[key], epoch=epoch)
+        else:
+            for attr in dir(obj):
+                if not isinstance(getattr(type(obj), attr, None), property):
+                    continue
+                signal_name = "{}_{}".format(signal_prefix, attr)
+                self.log(signal_name, getattr(obj, attr), epoch=epoch)
+
+
+    def log(self, signal, value, epoch=None):
         def __ship_ten():
             i = self.BufferSize
             messages = []
@@ -211,9 +239,16 @@ class Streamer:
             self.ship_messages(messages)
             self.console_message("ship10: finished shipping", level=2)
 
-
         timeStamp = time.time()
         gmtime = datetime.datetime.fromtimestamp(timeStamp)
+        
+        if epoch != None:
+            try:
+                gmtime = datetime.datetime.fromtimestamp(epoch)
+                timeStamp = epoch
+            except:
+                self.console_message("epoch was overriden with invalid time, using current timstamp instead")
+        
         formatted_gmTime = gmtime.strftime('%Y-%m-%d %H:%M:%S.%f')
         self.console_message("{time}: {signal} {value}".format(signal=signal, value=value, time=formatted_gmTime))
         
@@ -225,10 +260,9 @@ class Streamer:
     
         self.console_message("log: queueing log item", level=2)
         log_item = {
-            "v": value,
             "b": self.Bucket,
-            "dt": formatted_gmTime,
             "sn": signal,
+            "v": value,
             "e": timeStamp,
             "tid": self.SessionId
         }

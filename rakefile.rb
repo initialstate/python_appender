@@ -14,7 +14,11 @@ SECRET_ACCESS_KEY = ENV['issak'] || ENV["initialstate.secret_access_key"]
 ENVIRONMENT = ENV["env"] || 'dev'
 VERSION = `git describe --tags --long`
 
-task :default => [:release_version, :push_to_s3, :invalidate_cloudfront] do
+task :default => [:push_to_s3, :invalidate_cloudfront] do
+	puts "Finished!"
+end
+
+task :deploy => [:release_version, :push_to_s3, :invalidate_cloudfront] do
 	puts "Finished!"
 end
 

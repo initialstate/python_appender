@@ -1,0 +1,23 @@
+0.0.24 (unreleased)
+-------------------
+
+- Nothing changed yet.
+
+
+0.0.23 (2014-11-21)
+-------------------
+
+- Nothing changed yet.
+
+
+0.0.22 (2014-11-21)
+
+* feature: added log_object method to allow automatically logging flat objects attributes, dicts, and lists
+* feature: improved example_compute_metrics.py
+* feature: added object_log_example.py
+* feature: install script added check for pip version for `--pre` flag. added ability to specify wether or not to get pre-released streamer
+* fix: added condition in install script to ignore using `--pre` flag when pip version is less than 1.4
+* feature: added ability to override epoch timestamp via optional `epoch` parameter on `Streamer.log(signal, value[, epoch])`
+* feature: added ability to override buffer size before shipping logs via optional constructor parameter `Streamer([buffer_size])`
+* feature: added CHANGES.txt to repository to start documenting changes
+* fix: added more status code checks to bucket creation to return more descriptive message for incorrect `client_key`

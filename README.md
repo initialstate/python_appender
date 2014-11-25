@@ -72,7 +72,7 @@ After getting the ISStreamer module, usage is really simple. With the following 
 from ISStreamer.Streamer import Streamer
 
 # create a Streamer instance
-streamer = Streamer(bucket="SomeBucketName", client_key="YourClientKey")
+streamer = Streamer(bucket="Some Bucket Name", client_key="YourClientKey")
 
 # log some data
 streamer.log("signal_test", "hi")
@@ -90,29 +90,53 @@ streamer.close()
 - ####Buckets
 	In order to keep your logs and visualizations contextually appropriate, we have implemented a concept called `buckets`. The name of a bucket is like the name of a log file. They also behave similarly. If a bucket exists with the same name in your account and you log data to this bucket, you should expect that data to append, just like to an existing log file.
 	
-- ####`Streamer.log(signal, value)`
+- ####`Streamer.log(signal, value[, epoch])`
 	This is the core method and api for the log streamer. This is an asyncronous method that pushes your data to a queue that handles sending it off to Initial State's servers. You don't have to worry about anything but calling the method where you want! For the sake of clarity (for those new to python or programming) the variable `logger` in this case can be whatever you assign it to be, it's just the representation of the constructed `Streamer` object.
 	
-	The `log` method expects two paramets, `signal` and `value`:
+	The `log` method expects two parameters, `signal` and `value`:
 	- `signal` is a string that represents the source of the `value`
 	- `value` is either a string, boolean, or number and it represents a value at the time of the method call.
+	- `epoch` is an optional parameter to override the epoch timestamp, recommended for advanced uses.
+
+- ####`Streamer.log_object(obj[, signal_prefix[, epoch]])`
+	This is an enhanced method to abstract having to write a bunch of log statements to log all of the values of an object.
+
+	The `log_object` method expects one parameter, `obj`:
+	- `obj` is either a list, dict, or simple object with attributes.
+		- If `obj` is a list, it will use the signal name `list_n` unless the optional `signal_prefix` is supplied, then it will use `signal_prefix_n` where `n` - in both cases - is an iterator identifier.
+		- If `obj` is a dict, it will use the signal name `dict_key` where unless the optional `signal_prefix` is supplied, then it will use `signal_prefix_key` where `key` - in both cases - is the key of the dictionary value.
+		- If `obj` is a simple object, it will iterate over the objects attributes and produce values for signals with the name of the signal as `obj_attr` unless the `signal_prefix` is supplied, then it will use `signal_prefix_attr`. In all cases, `attr` is the attribute name.
+	- `signal_prefix` is an optional string that optionally overrrides the default signal prefixes.
+	- `epoch` is an optional number that represents the current time in epoch format.
+
+	> NOTE: log_object will log multiple signals and values, but will override the timestamp of all values to ensure the values are relateable and there is no cpu based skew between the values being logged to the buffer.
+
 
 ###Advanced Use
 - ####Manual `flush()`
 	You can manually flush at your own accord by calling `Streamer.flush()`. This will ensure that anything that has been queued locally  will get sent to Initial State's log processing servers.
 	
+- ####Changing buffer size
+	You can override the default log buffer item size by passing the optional `buffer_size` parameter into the Streamer constructor. Here is an example:
+
+	```python
+	streamer = Streamer(bucket="Hi!", client_key="YourClientKey", buffer_size=20)
+	```
+
+	In this example, the `buffer_size` is being increased to 20 from the default, 10. The decision to override this value should be based on how many log statements you make in a loop before sleeping. You can typically play around with this number help tune performance of the Streamer.
+
 - ####Creating a new bucket
 	When you construct a `Streamer` the constructor expects a name that it will assign to a new bucket that it will use as the context for `Streamer.log(signal, value)`. The bucket is created new every time the `Streamer` is constructed. If you want to switch which to a new bucket, because say you've started a new session or run, simply call `Streamer.new_bucket('some_bucket_name')` here is an example:
 	
 	```python
-	streamer = Streamer(bucket="starting_bucket", client_key="YourClientKey")
+	streamer = Streamer(bucket="Starting Bucket", client_key="YourClientKey")
 	
 	streamer.log("signal1", "starting")
-	streamer.new_bucket("new_bucket")
+	streamer.set_bucket("New Bucket")
 	streamer.log("signal1", "starting")
 	```  
 
-	In this example, you will get a signal1=starting in two different buckets: "starting_bucket" and "new_bucekt".
+	In this example, you will get a signal1=starting in two different buckets: "Starting Bucket" and "New Bucket".
 
 
 ###Troubleshooting
