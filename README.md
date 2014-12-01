@@ -169,6 +169,19 @@ streamer.close()
 	...
 	```
 
+- ####Overriding the timestamp
+	Some have asked for the ability to override the timestamp. Currently, the timestamp is automatically associated with data by retrieving the most accurate timestamp possible from the device as soon as a `log` or `log_object` method is called. However, you can override this by doing the following:
+
+	```python
+
+	time = time.time()
+
+	streamer.log("siganl", 5, epoch=time)
+
+	```
+
+	For a full example checkout [this](/example_app/time_override_example.py)
+
 
 - ####Creating a new bucket
 	When you construct a `Streamer` the constructor expects a name that it will assign to a new bucket that it will use as the context for `Streamer.log(signal, value)`. The bucket is created new every time the `Streamer` is constructed. If you want to switch which to a new bucket, because say you've started a new session or run, simply call `Streamer.new_bucket('some_bucket_name')` here is an example:
