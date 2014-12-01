@@ -1,7 +1,9 @@
 import psutil
 import time
 from ISStreamer.Streamer import Streamer
-streamer = Streamer(bucket="Perf 10ms sampling; buffer 20; object logging; python2", buffer_size=20)
+
+# Provide a client_key from local ini file, override buffer and flush for optimal streaming
+streamer = Streamer(bucket="Example Performance Metrics", buffer_size=100, ini_file_location="./isstreamer.ini")
 
 sample_rate_in_ms=10
 
@@ -28,6 +30,11 @@ for x in range(100):
 	network = psutil.net_io_counters()
 	streamer.log_object(network, signal_prefix="net_io")
 
+	# flush the stream to ensure optimal buffer and consumption experience
+	streamer.flush()
+
+	# sleep before sampling again
 	time.sleep(sample_rate_in_ms/1000)
 
+# cleanup the stream and ensure logs are flushed
 streamer.close()
