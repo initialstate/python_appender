@@ -2,9 +2,9 @@ import time
 from ISStreamer.Streamer import Streamer
 
 # NOTE: the client_key is being provided by a local .ini file
-streamer = Streamer(bucket="Time Override Example")
+streamer = Streamer(bucket="Time Override Example", ini_file_location="./isstreamer.ini")
 
-for x in range(100):
+for x in range(10):
 
 	# Get the current timestamp in epoch
 	iteration_time = time.time()
