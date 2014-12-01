@@ -111,6 +111,8 @@ streamer.close()
 	- `signal_prefix` is an optional string that optionally overrrides the default signal prefixes.
 	- `epoch` is an optional number that represents the current time in epoch format.
 
+	[Here is a working example](/example_app/example_compute_metrics.py).
+
 	> NOTE: log_object will log multiple signals and values, but will override the timestamp of all values to ensure the values are relateable and there is no cpu based skew between the values being logged to the buffer.
 
 - ####`Streamer.close()`
