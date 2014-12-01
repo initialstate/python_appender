@@ -23,8 +23,15 @@ def main(argv):
 	streamer = Streamer(bucket=bucket, client_key=client_key)
 
 	try:
-		while 1:	
-			log = raw_input()
+		while 1:
+			log = ''
+			if (sys.version_info < (2,7,0)):
+			    sys.stderr.write("You need at least python 2.7.0 to use the ISStreamer")
+			    exit(1)
+			elif (sys.version_info >= (3,0)):
+			    log = input()
+			else:
+			    log = raw_input()
 			parts = log.split(',')
 
 			if len(parts) == 2:
