@@ -18,6 +18,8 @@ def main(argv):
 			bucket = arg
 		elif opt in ("-k", "--client_key"):
 			client_key = arg
+
+
 	streamer = Streamer(bucket=bucket, client_key=client_key)
 
 	try:
@@ -27,6 +29,8 @@ def main(argv):
 
 			if len(parts) == 2:
 				streamer.log(parts[0].strip(), parts[1].strip())
+			else:
+				print("format should be \"key, value\"")
 
 	except KeyboardInterrupt:
 		streamer.close()
