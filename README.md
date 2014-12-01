@@ -89,7 +89,8 @@ streamer.close()
 ###Concepts
 - ####Buckets
 	In order to keep your logs and visualizations contextually appropriate, we have implemented a concept called `buckets`. The name of a bucket is like the name of a log file. They also behave similarly. If a bucket exists with the same name in your account and you log data to this bucket, you should expect that data to append, just like to an existing log file.
-	
+
+###Most Used Methods
 - ####`Streamer.log(signal, value[, epoch])`
 	This is the core method and api for the log streamer. This is an asyncronous method that pushes your data to a queue that handles sending it off to Initial State's servers. You don't have to worry about anything but calling the method where you want! For the sake of clarity (for those new to python or programming) the variable `logger` in this case can be whatever you assign it to be, it's just the representation of the constructed `Streamer` object.
 	
@@ -111,6 +112,8 @@ streamer.close()
 
 	> NOTE: log_object will log multiple signals and values, but will override the timestamp of all values to ensure the values are relateable and there is no cpu based skew between the values being logged to the buffer.
 
+- ####`Streamer.close()`
+	This method ensures that the log buffer is flushed and should be called when a program is exiting. It is also called during the `__del__` magic method of the `Streamer` by python, but it is a best practice to explicitly call it at the end of a program to ensure it is executed.
 
 ###Advanced Use
 - ####Manual `Streamer.flush()`
@@ -161,7 +164,7 @@ streamer.close()
 
 		# sleep for 10 seconds
 		time.sleep(10)
-	
+
 	...
 	```
 
