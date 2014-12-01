@@ -113,17 +113,58 @@ streamer.close()
 
 
 ###Advanced Use
-- ####Manual `flush()`
+- ####Manual `Streamer.flush()`
 	You can manually flush at your own accord by calling `Streamer.flush()`. This will ensure that anything that has been queued locally  will get sent to Initial State's log processing servers.
 	
 - ####Changing buffer size
-	You can override the default log buffer item size by passing the optional `buffer_size` parameter into the Streamer constructor. Here is an example:
+	You can override the default log buffer size (the count of log items) by passing the optional `buffer_size` parameter into the Streamer constructor. Here is an example:
 
 	```python
 	streamer = Streamer(bucket="Hi!", client_key="YourClientKey", buffer_size=20)
 	```
 
 	In this example, the `buffer_size` is being increased to 20 from the default, 10. The decision to override this value should be based on how many log statements you make in a loop before sleeping. You can typically play around with this number help tune performance of the Streamer.
+
+	Another great example of overriding the buffer_size would be to increase to a large value and use the `Streamer.flush()` method at the end of each iteration to effectively have a dynamic buffer size. Here is an example:
+
+	```python
+	...
+
+	streamer = Streamer(bucket="Dynamic Buffer", client_key="YourClientKey", buffer_size=200)
+
+	counter = 0
+	while 1:
+		streamer.log("loop_counter", counter)
+
+		some_dict = {
+			"a": 1,
+			"b": 2,
+			"c": 3
+		}
+		streamer.log_object(some_dict, signal_prefix="some_dict")
+
+		dynamic_list = SomeOtherModule.PracticalClass.get_stuff()
+		
+		# We don't know how many items will be in dynamic_list, so we just
+		# log the list to get them all. However, since we don't know how many
+		# there will be, we don't know the optimal buffer size, so we set the
+		# buffer to a high value and flush at the end of the iteration
+		streamer.log_object(dynamic_list)
+
+		# Here we will flush the log buffer to insure that there isn't a delay
+		# in sending the logs that we've created previous to this point while
+		# waiting for the sleep to finish
+		streamer.flush()
+
+		# increment counter
+		counter += 1
+
+		# sleep for 10 seconds
+		time.sleep(10)
+	
+	...
+	```
+
 
 - ####Creating a new bucket
 	When you construct a `Streamer` the constructor expects a name that it will assign to a new bucket that it will use as the context for `Streamer.log(signal, value)`. The bucket is created new every time the `Streamer` is constructed. If you want to switch which to a new bucket, because say you've started a new session or run, simply call `Streamer.new_bucket('some_bucket_name')` here is an example:
