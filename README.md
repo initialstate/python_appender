@@ -88,6 +88,7 @@ streamer.close()
 
 ###Concepts
 - ####Buckets
+
 	In order to keep your logs and visualizations contextually appropriate, we have implemented a concept called `buckets`. The name of a bucket is like the name of a log file. They also behave similarly. If a bucket exists with the same name in your account and you log data to this bucket, you should expect that data to append, just like to an existing log file.
 
 ###Most Used Methods
