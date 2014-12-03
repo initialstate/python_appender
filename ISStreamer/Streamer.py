@@ -261,10 +261,10 @@ class Streamer:
         self.console_message("log: queueing log item", level=2)
         log_item = {
             "b": self.Bucket,
-            "sn": signal,
+            "s": signal,
             "v": value,
             "e": timeStamp,
-            "tid": self.SessionId
+            "sid": self.SessionId
         }
         self.LogQueue.append(log_item)
 
