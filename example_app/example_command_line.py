@@ -25,13 +25,16 @@ def main(argv):
 	try:
 		while 1:
 			log = ''
-			if (sys.version_info < (2,7,0)):
-			    sys.stderr.write("You need at least python 2.7.0 to use the ISStreamer")
-			    exit(1)
-			elif (sys.version_info >= (3,0)):
-			    log = input()
-			else:
-			    log = raw_input()
+			try:
+				if (sys.version_info < (2,7,0)):
+				    sys.stderr.write("You need at least python 2.7.0 to use the ISStreamer")
+				    exit(1)
+				elif (sys.version_info >= (3,0)):
+				    log = input()
+				else:
+				    log = raw_input()
+			except EOFError:
+				break
 			parts = log.split(',')
 
 			if len(parts) == 2:
