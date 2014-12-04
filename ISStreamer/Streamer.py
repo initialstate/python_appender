@@ -25,6 +25,7 @@ import time
 # performance stuff
 import threading
 import collections
+import csv
 
 class Streamer:
     CoreApiBase = ""
@@ -40,8 +41,25 @@ class Streamer:
     DebugLevel = 0
     SessionId = ""
     IsClosed = True
-    def __init__(self, bucket="", client_key="", ini_file_location=None, debug_level=0, buffer_size=10):
+    Offline = False
+    LocalFile = None
+    def __init__(self, bucket="", client_key="", ini_file_location=None, debug_level=0, buffer_size=10, offline=None):
         config = configutil.getConfig(ini_file_location)
+        if (offline != None):
+            self.Offline = offline
+        else:
+            if (config["offline_mode"] == "false"):
+                self.Offline = False
+            else:
+                self.Offline = True
+
+        if (self.Offline):
+            try:
+                file_location = "{}.csv".format(config["offline_file"])
+                localFile = open(file_location, 'w')
+                self.LocalFile = csv.writer(localFile)
+            except:
+                print("There was an issue opening the file (nees more description)")
 
         if (config == None and bucket=="" and client_key == ""):
             raise Exception("config not found and arguments empty")
@@ -126,9 +144,12 @@ class Streamer:
 
         self.SessionId = str(uuid.uuid4())
         self.Bucket = new_bucket
-        t = threading.Thread(target=__create_bucket, args=(new_bucket, self.SessionId, self.ClientKey))
-        t.daemon = False
-        t.start()
+        if (not self.Offline):
+            t = threading.Thread(target=__create_bucket, args=(new_bucket, self.SessionId, self.ClientKey))
+            t.daemon = False
+            t.start()
+        else:
+            self.console_message("Working in offline mode.", level=0)
 
     def console_message(self, message, level=1):
         if (self.DebugLevel >= level):
@@ -181,6 +202,9 @@ class Streamer:
             
 
     def flush(self):
+        if (self.Offline):
+            self.console_message("flush: no need, in offline mode", level=2)
+            return
         messages = []
         self.console_message("flush: checking queue", level=2)
         isEmpty = False
@@ -252,21 +276,25 @@ class Streamer:
         formatted_gmTime = gmtime.strftime('%Y-%m-%d %H:%M:%S.%f')
         self.console_message("{time}: {signal} {value}".format(signal=signal, value=value, time=formatted_gmTime))
         
-        if (len(self.LogQueue) >= self.BufferSize):
-            self.console_message("log: queue size approximately at or greater than buffer size, shipping!", level=10)
-            t = threading.Thread(target=__ship_ten)
-            t.daemon = False
-            t.start()
-    
-        self.console_message("log: queueing log item", level=2)
-        log_item = {
-            "b": self.Bucket,
-            "s": signal,
-            "v": value,
-            "e": timeStamp,
-            "sid": self.SessionId
-        }
-        self.LogQueue.append(log_item)
+        if (not self.Offline):
+            if (len(self.LogQueue) >= self.BufferSize):
+                self.console_message("log: queue size approximately at or greater than buffer size, shipping!", level=10)
+                t = threading.Thread(target=__ship_ten)
+                t.daemon = False
+                t.start()
+        
+            self.console_message("log: queueing log item", level=2)
+            log_item = {
+                "b": self.Bucket,
+                "s": signal,
+                "v": value,
+                "e": timeStamp,
+                "sid": self.SessionId
+            }
+            self.LogQueue.append(log_item)
+        else:
+            self.LocalFile.writerow([formatted_gmTime, signal, value])
+
 
     def close(self):
         self.IsClosed = True

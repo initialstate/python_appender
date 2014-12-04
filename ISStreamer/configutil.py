@@ -11,6 +11,8 @@ def getConfig(ini_file_location=None):
     config_return = {
             "bucket": "",
             "clientKey": "",
+            "offline_mode": "false",
+            "offline_file": "./isstreamer_out.csv",
             "core_api_base": "https://api.initialstate.com",
             "stream_api_base": "https://groker.initialstate.com"
         }
@@ -39,10 +41,14 @@ def getConfig(ini_file_location=None):
         config = configparser.ConfigParser()
         config.read(config_file_path)
         if (config.has_section("isstreamer.client_config")):
-            if (config.has_option("isstreamer.client_config", "ClientKey")):
-                config_return["clientKey"] = config.get("isstreamer.client_config", "ClientKey")
-            if (config.has_option("isstreamer.client_config", "DefaultBucket")):
-                config_return["bucket"] = config.get("isstreamer.client_config", "DefaultBucket")
+            if (config.has_option("isstreamer.client_config", "client_key")):
+                config_return["clientKey"] = config.get("isstreamer.client_config", "client_key")
+            if (config.has_option("isstreamer.client_config", "default_bucket")):
+                config_return["bucket"] = config.get("isstreamer.client_config", "default_bucket")
+            if (config.has_option("isstreamer.client_config", "offline_mode")):
+                config_return["offline_mode"] = config.get("isstreamer.client_config", "offline_mode")
+            if (config.has_option("isstreamer.client_config", "offline_file")):
+                config_return["offline_file"] = config.get("isstreamer.client_config", "offline_file")
         if (config.has_section("isstreamer.api_config")):
             if (config.has_option("isstreamer.api_config", "core_api_base")):
                 config_return["core_api_base"] = config.get("isstreamer.api_config", "core_api_base")
