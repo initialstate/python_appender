@@ -56,8 +56,8 @@ class Streamer:
         if (self.Offline):
             try:
                 file_location = "{}.csv".format(config["offline_file"])
-                localFile = open(file_location, 'w')
-                self.LocalFile = csv.writer(localFile)
+                self.LocalFileHandler = open(file_location, 'w')
+                self.LocalFile = csv.writer(self.LocalFileHandler)
             except:
                 print("There was an issue opening the file (nees more description)")
 
@@ -299,6 +299,9 @@ class Streamer:
     def close(self):
         self.IsClosed = True
         self.flush()
+        if (self.Offline):
+            self.console_message("closing local file handler", level=2)
+            self.LocalFileHandler.close()
 
     def __del__(self):
         """Try to close/flush the cache before destruction"""
