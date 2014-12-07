@@ -293,7 +293,7 @@ class Streamer:
             }
             self.LogQueue.append(log_item)
         else:
-            self.LocalFile.writerow([formatted_gmTime, signal, value])
+            self.LocalFile.writerow([timeStamp, signal, value])
 
 
     def close(self):
