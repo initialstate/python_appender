@@ -3,13 +3,14 @@ from ISStreamer.Streamer import Streamer
 
 def read_args(argv):
 	try:
-		opts, args = getopt.getopt(argv,"hb:k:",["bucket_name=", "client_key="])
+		opts, args = getopt.getopt(argv,"hb:k:f:",["bucket_name=", "client_key=", "file_location="])
 	except getopt.GetoptError:
-		print('example_command_line.py -b <bucket_name> -k <client_key> -f <file_location>')
+		print('example_read_csv.py -b <bucket_name> -k <client_key> -f <file_location>')
+		sys.exit(1)
 
 	for opt, arg in opts:
 		if opt == '-h':
-			print('example_command_line.py -b <bucket_name> -k <client_key>')
+			print('example_read_csv.py -b <bucket_name> -k <client_key> -f <file_location>')
 		elif opt in ("-b", "--bucket_name"):
 			bucket = arg
 		elif opt in ("-k", "--client_key"):
