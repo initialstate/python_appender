@@ -170,6 +170,7 @@ class Streamer:
         headers = {
             'Content-Type': 'application/json',
             'User-Agent': 'PyStreamer v' + version.__version__,
+            'Accept-Version': '0.0.1',
             'X-IS-ClientKey': self.ClientKey
         }
 
