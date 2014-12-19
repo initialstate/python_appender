@@ -1,12 +1,12 @@
 from ISStreamer.Streamer import Streamer
-logger = Streamer("example_offline", debug_level=2, offline=True)
+streamer = Streamer("test", debug_level=2)
 
 def stress_test_loop(i, num):
 	while i > 0:
-		logger.log("iterations_left_{n}".format(n=num), i)
+		streamer.log("iterations_left_{n}".format(n=num), i)
 		i = i - 1
 
 
-stress_test_loop(22, 1)
+stress_test_loop(2, 1)
 
-logger.close()
+streamer.close()
