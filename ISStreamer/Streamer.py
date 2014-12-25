@@ -28,7 +28,6 @@ import collections
 import csv
 
 class Streamer:
-    CoreApiBase = ""
     Bucket = ""
     ClientKey = ""
     PubKey = ""
@@ -78,39 +77,37 @@ class Streamer:
         self.BufferSize = buffer_size
         self.LogQueue = collections.deque()
 
-        self.CoreApiBase = config["core_api_base"]
         self.StreamApiBase = config["stream_api_base"]
         self.set_bucket(bucket_name)
         self.DebugLevel = debug_level
         self.IsClosed = False
 
         self.console_message("ClientKey: {clientKey}".format(clientKey=self.ClientKey))
-        self.console_message("core_api_base: {api}".format(api=self.CoreApiBase))
         self.console_message("stream_api_base: {api}".format(api=self.StreamApiBase))
     
 
     def set_bucket(self, new_bucket, retries=3):
 
-        def __create_bucket(new_bucket, bucket_id, client_key):
-            api_base = self.CoreApiBase
+        def __create_bucket(new_bucket, session_id, client_key):
+            api_base = self.StreamApiBase
             conn = None
-            if (self.CoreApiBase.startswith('https://')):
-                api_base = self.CoreApiBase[8:]
-                self.console_message("core api base domain: {domain}".format(domain=api_base), level=2)
+            if (self.StreamApiBase.startswith('https://')):
+                api_base = self.StreamApiBase[8:]
+                self.console_message("stream api base domain: {domain}".format(domain=api_base), level=2)
                 conn = httplib.HTTPSConnection(api_base)
             else:
-                api_base = self.CoreApiBase[7:]
-                self.console_message("core api base domain: {domain}".format(domain=api_base), level=2)
+                api_base = self.StreamApiBase[7:]
+                self.console_message("stream api base domain: {domain}".format(domain=api_base), level=2)
                 conn = httplib.HTTPConnection(api_base)
-            resource = "/api/v1/buckets"
+            resource = "/buckets"
             headers = {
                 'Content-Type': 'application/json',
-                'User-Agent': 'PyStreamer v' + version.__version__
+                'User-Agent': 'PyStreamer v' + version.__version__,
+                'X-IS-ClientKey': client_key
             }
             body = {
-                'bucketId': bucket_id,
+                'sessionId': session_id,
                 'bucketName': new_bucket,
-                'clientKey': client_key
             }
 
             def ___ship(retry_attempts, wait=0):
@@ -165,7 +162,7 @@ class Streamer:
             api_base = self.StreamApiBase[7:]
             self.console_message("ship messages: stream api base domain: {domain}".format(domain=api_base), level=2)
             conn = httplib.HTTPConnection(api_base)
-        resource = "/batch_logs"
+        resource = "/events"
         headers = {
             'Content-Type': 'application/json',
             'User-Agent': 'PyStreamer v' + version.__version__,
