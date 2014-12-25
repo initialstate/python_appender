@@ -42,6 +42,7 @@ class Streamer:
     IsClosed = True
     Offline = False
     LocalFile = None
+    ApiVersion = '0.0.1'
     def __init__(self, bucket="", client_key="", ini_file_location=None, debug_level=0, buffer_size=10, offline=None):
         config = configutil.getConfig(ini_file_location)
         if (offline != None):
@@ -103,6 +104,7 @@ class Streamer:
             headers = {
                 'Content-Type': 'application/json',
                 'User-Agent': 'PyStreamer v' + version.__version__,
+                'Accept-Version': self.ApiVersion,
                 'X-IS-ClientKey': client_key
             }
             body = {
@@ -166,7 +168,7 @@ class Streamer:
         headers = {
             'Content-Type': 'application/json',
             'User-Agent': 'PyStreamer v' + version.__version__,
-            'Accept-Version': '0.0.1',
+            'Accept-Version': self.ApiVersion,
             'X-IS-ClientKey': self.ClientKey
         }
 
