@@ -28,22 +28,19 @@ import collections
 import csv
 
 class Streamer:
-    Bucket = ""
+    BucketName = ""
     ClientKey = ""
-    PubKey = ""
-    SubKey = ""
     Channel = ""
     BufferSize = 10
-    LogIterations = 0
     StreamApiBase = ""
     LogQueue = None
     DebugLevel = 0
-    SessionId = ""
+    BucketKey = ""
     IsClosed = True
     Offline = False
     LocalFile = None
     ApiVersion = '0.0.1'
-    def __init__(self, bucket="", client_key="", ini_file_location=None, debug_level=0, buffer_size=10, offline=None):
+    def __init__(self, bucket_name="", bucket_key="", client_key="", ini_file_location=None, debug_level=0, buffer_size=10, offline=None):
         config = configutil.getConfig(ini_file_location)
         if (offline != None):
             self.Offline = offline
@@ -61,13 +58,13 @@ class Streamer:
             except:
                 print("There was an issue opening the file (nees more description)")
 
-        if (config == None and bucket=="" and client_key == ""):
+        if (config == None and bucket_name=="" and client_key == ""):
             raise Exception("config not found and arguments empty")
         
-        if (bucket == ""):
+        if (bucket_name == ""):
             bucket_name = config["bucket"]
         else:
-            bucket_name = bucket
+            bucket_name = bucket_name
         if (client_key == ""):
             self.ClientKey = config["clientKey"]
         else:
@@ -75,11 +72,12 @@ class Streamer:
 
 
         #self.LogQueue = Queue.Queue(self.BufferSize)
+        self.BucketKey = bucket_key
         self.BufferSize = buffer_size
         self.LogQueue = collections.deque()
 
         self.StreamApiBase = config["stream_api_base"]
-        self.set_bucket(bucket_name)
+        self.set_bucket(bucket_name, bucket_key)
         self.DebugLevel = debug_level
         self.IsClosed = False
 
@@ -87,9 +85,9 @@ class Streamer:
         self.console_message("stream_api_base: {api}".format(api=self.StreamApiBase))
     
 
-    def set_bucket(self, new_bucket, retries=3):
+    def set_bucket(self, bucket_name, bucket_key, retries=3):
 
-        def __create_bucket(new_bucket, session_id, client_key):
+        def __create_bucket(new_bucket_name, new_bucket_key, client_key):
             api_base = self.StreamApiBase
             conn = None
             if (self.StreamApiBase.startswith('https://')):
@@ -108,8 +106,8 @@ class Streamer:
                 'X-IS-ClientKey': client_key
             }
             body = {
-                'sessionId': session_id,
-                'bucketName': new_bucket,
+                'bucketKey': new_bucket_key,
+                'bucketName': new_bucket_name,
             }
 
             def ___ship(retry_attempts, wait=0):
@@ -140,10 +138,12 @@ class Streamer:
 
             ___ship(retries)
 
-        self.SessionId = str(uuid.uuid4())
-        self.Bucket = new_bucket
+        self.BucketKey = bucket_key
+        if (self.BucketKey == ""):
+            self.BucketKey = str(uuid.uuid4())
+        self.BucketName = bucket_name
         if (not self.Offline):
-            t = threading.Thread(target=__create_bucket, args=(new_bucket, self.SessionId, self.ClientKey))
+            t = threading.Thread(target=__create_bucket, args=(bucket_name, bucket_key, self.ClientKey))
             t.daemon = False
             t.start()
         else:
@@ -169,7 +169,8 @@ class Streamer:
             'Content-Type': 'application/json',
             'User-Agent': 'PyStreamer v' + version.__version__,
             'Accept-Version': self.ApiVersion,
-            'X-IS-ClientKey': self.ClientKey
+            'X-IS-ClientKey': self.ClientKey,
+            'X-IS-BucketKey': self.BucketKey
         }
 
         def __ship(retry_attempts, wait=0):
@@ -286,11 +287,9 @@ class Streamer:
         
             self.console_message("log: queueing log item", level=2)
             log_item = {
-                "b": self.Bucket,
-                "s": signal,
-                "v": value,
-                "e": timeStamp,
-                "sid": self.SessionId
+                "signal": signal,
+                "value": value,
+                "epoch": timeStamp
             }
             self.LogQueue.append(log_item)
         else:
