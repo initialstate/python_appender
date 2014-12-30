@@ -81,7 +81,7 @@ class Streamer:
         self.DebugLevel = debug_level
         self.IsClosed = False
 
-        self.console_message("ClientKey: {clientKey}".format(clientKey=self.ClientKey))
+        self.console_message("client_key: {clientKey}".format(clientKey=self.ClientKey))
         self.console_message("stream_api_base: {api}".format(api=self.StreamApiBase))
     
 
@@ -98,7 +98,7 @@ class Streamer:
                 api_base = self.StreamApiBase[7:]
                 self.console_message("stream api base domain: {domain}".format(domain=api_base), level=2)
                 conn = httplib.HTTPConnection(api_base)
-            resource = "/buckets"
+            resource = "/api/buckets"
             headers = {
                 'Content-Type': 'application/json',
                 'User-Agent': 'PyStreamer v' + version.__version__,
@@ -164,7 +164,7 @@ class Streamer:
             api_base = self.StreamApiBase[7:]
             self.console_message("ship messages: stream api base domain: {domain}".format(domain=api_base), level=2)
             conn = httplib.HTTPConnection(api_base)
-        resource = "/events"
+        resource = "/api/events"
         headers = {
             'Content-Type': 'application/json',
             'User-Agent': 'PyStreamer v' + version.__version__,
