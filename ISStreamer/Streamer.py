@@ -126,6 +126,7 @@ class Streamer:
 
                     if (response.status >= 200 and response.status < 300):
                         self.console_message("bucket created successfully!", level=2)
+                        self.console_message("bucket created with \n   bucket_key: {bk} \n   bucket_name: {bn}".format(bk=new_bucket_key, bn=new_bucket_name), level=2)
                     elif (response.status == 401 or response.status == 403):
                         self.console_message("ERROR: ClientKey not authorized: " + self.ClientKey)
                     else:
@@ -138,9 +139,10 @@ class Streamer:
 
             ___ship(retries)
 
+        if (bucket_key == None or bucket_key == ""):
+            bucket_key = str(uuid.uuid4())
+
         self.BucketKey = bucket_key
-        if (self.BucketKey == ""):
-            self.BucketKey = str(uuid.uuid4())
         self.BucketName = bucket_name
         if (not self.Offline):
             t = threading.Thread(target=__create_bucket, args=(bucket_name, bucket_key, self.ClientKey))
