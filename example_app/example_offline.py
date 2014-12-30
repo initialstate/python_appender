@@ -1,7 +1,7 @@
 import time
 from ISStreamer.Streamer import Streamer
 
-logger = Streamer(bucket="Stream Example", debug_level=2, offline=True)
+logger = Streamer(bucket_name="Stream Example", debug_level=2, offline=True)
 
 logger.log("My Messages", "Stream Starting")
 for num in range(1, 100):

@@ -20,7 +20,7 @@ def main(argv):
 			client_key = arg
 
 
-	streamer = Streamer(bucket=bucket, client_key=client_key)
+	streamer = Streamer(bucket_name=bucket, client_key=client_key)
 
 	try:
 		while 1:

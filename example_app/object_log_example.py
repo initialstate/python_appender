@@ -2,7 +2,7 @@ import psutil
 from ISStreamer.Streamer import Streamer
 
 
-streamer = Streamer(bucket="test object logging", debug_level=2)
+streamer = Streamer(bucket_name="test object logging", debug_level=2)
 
 # Example dict
 streamer.log_object({"foo": "1", "bar": "2"})

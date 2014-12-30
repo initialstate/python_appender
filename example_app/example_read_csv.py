@@ -24,7 +24,7 @@ def read_args(argv):
 if __name__ == "__main__":
 	bucket, client_key, file_location = read_args(sys.argv[1:])
 
-	streamer = Streamer(bucket=bucket, client_key=client_key, buffer_size=20, offline=False)
+	streamer = Streamer(bucket_name=bucket, client_key=client_key, buffer_size=20, offline=False)
 
 	with open(file_location, 'rb') as csvfile:
 		reader = csv.reader(csvfile)

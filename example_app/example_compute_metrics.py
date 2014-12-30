@@ -3,7 +3,7 @@ import time
 from ISStreamer.Streamer import Streamer
 
 # Provide a client_key from local ini file, override buffer and flush for optimal streaming
-streamer = Streamer(bucket="Example Performance Metrics", buffer_size=100, ini_file_location="./isstreamer.ini")
+streamer = Streamer(bucket_name="Example Performance Metrics", buffer_size=100, ini_file_location="./isstreamer.ini")
 
 sample_rate_in_ms=10
 

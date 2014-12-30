@@ -5,5 +5,4 @@
 #offline_file: ./testing_config
 
 #[isstreamer.api_config]
-#core_api_base: https://dev-api.initialstate.com
 #stream_api_base: https://groker-dev.initialstate.com

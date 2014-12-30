@@ -2,7 +2,7 @@ import time
 from ISStreamer.Streamer import Streamer
 
 # NOTE: the client_key is being provided by a local .ini file
-streamer = Streamer(bucket="Time Override Example", ini_file_location="./isstreamer.ini")
+streamer = Streamer(bucket_name="Time Override Example", ini_file_location="./isstreamer.ini")
 
 for x in range(10):
 
