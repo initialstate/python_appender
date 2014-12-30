@@ -57,7 +57,7 @@ The package is hosted in PyPI under the package name [ISStreamer](https://pypi.p
 
 
 ```
-$ sudo pip install ISStreamer --pre
+$ sudo pip install ISStreamer
 ```
 
 > This command installs the ISStreamer module (currently it's an Alpha package, so you will need to specify the `--pre` command flag)
@@ -72,7 +72,7 @@ After getting the ISStreamer module, usage is really simple. With the following 
 from ISStreamer.Streamer import Streamer
 
 # create a Streamer instance
-streamer = Streamer(bucket="Some Bucket Name", client_key="YourClientKey")
+streamer = Streamer(bucket_name="Some Bucket Name", client_key="YourClientKey")
 
 # log some data
 streamer.log("signal_test", "hi")
@@ -126,7 +126,7 @@ streamer.close()
 	You can override the default log buffer size (the count of log items) by passing the optional `buffer_size` parameter into the Streamer constructor. Here is an example:
 
 	```python
-	streamer = Streamer(bucket="Hi!", client_key="YourClientKey", buffer_size=20)
+	streamer = Streamer(bucket_name="Hi!", client_key="YourClientKey", buffer_size=20)
 	```
 
 	In this example, the `buffer_size` is being increased to 20 from the default, 10. The decision to override this value should be based on how many log statements you make in a loop before sleeping. You can typically play around with this number help tune performance of the Streamer.
@@ -136,7 +136,7 @@ streamer.close()
 	```python
 	...
 
-	streamer = Streamer(bucket="Dynamic Buffer", client_key="YourClientKey", buffer_size=200)
+	streamer = Streamer(bucket_name="Dynamic Buffer", client_key="YourClientKey", buffer_size=200)
 
 	counter = 0
 	while 1:
@@ -186,13 +186,13 @@ streamer.close()
 
 
 - ####Creating a new bucket
-	When you construct a `Streamer` the constructor expects a name that it will assign to a new bucket that it will use as the context for `Streamer.log(signal, value)`. The bucket is created new every time the `Streamer` is constructed. If you want to switch which to a new bucket, because say you've started a new session or run, simply call `Streamer.new_bucket('some_bucket_name')` here is an example:
+	When you construct a `Streamer` the constructor expects a name or a key that it will use to ensure there is a bucket that it will use as the context for `Streamer.log(signal, value)`. Buckets are either created or consumed based on the unique combination of a `client_key` and a `bucket_key`. If you want to switch which to a new bucket, because say you've started a new session or run, simply call `Streamer.set_bucket(bucket_name='some_bucket_name'[, bucket_key='some_bucket_key'])`. Note that bucket_key is optional, if not provided the module will create a uuid4 as the `bucket_key`. Here is an example:
 	
 	```python
-	streamer = Streamer(bucket="Starting Bucket", client_key="YourClientKey")
+	streamer = Streamer(bucket_name="Starting Bucket", client_key="YourClientKey")
 	
 	streamer.log("signal1", "starting")
-	streamer.set_bucket("New Bucket")
+	streamer.set_bucket(bucket_name="New Bucket")
 	streamer.log("signal1", "starting")
 	```  
 
@@ -204,7 +204,7 @@ streamer.close()
 If you're having issues with your data you might want to try running ISStreamer at a higher debug level:
 
 ```python
-logger = Streamer(bucket="SomeBucketName", cluent_key="YourClientKey", debug_level=2)
+logger = Streamer(bucket_name="SomeBucketName", client_key="YourClientKey", debug_level=2)
 ```
 
 With a `debug_level` at or greater than 2 the streamer will throw exceptions on logging errors. Otherwise, it will assume logging errors are not fundamentally exceptional. It will also display more verbouse logging information.
