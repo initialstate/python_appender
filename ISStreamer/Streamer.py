@@ -124,7 +124,7 @@ class Streamer:
                     conn.request("POST", resource, json.dumps(body), headers)
                     response = conn.getresponse()
 
-                    if (response.status == 200):
+                    if (response.status == 200 or response.status == 204):
                         self.console_message("bucket most likely exists: " + response.body, level=2)
                     elif (response.status == 201):
                         self.console_message("bucket created successfully!", level=2)
