@@ -125,7 +125,7 @@ class Streamer:
                     response = conn.getresponse()
 
                     if (response.status == 200 or response.status == 204):
-                        self.console_message("bucket most likely exists: " + response.body, level=2)
+                        self.console_message("bucket most likely exists", level=2)
                     elif (response.status == 201):
                         self.console_message("bucket created successfully!", level=2)
                         self.console_message("bucket created with \n   bucket_key: {bk} \n   bucket_name: {bn}".format(bk=new_bucket_key, bn=new_bucket_name), level=2)
@@ -134,8 +134,9 @@ class Streamer:
                     else:
                         self.console_message("ISStreamer failed to setup the bucket on attempt {atmpt}. StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
                         raise Exception("ship exception")
-                except:
+                except Exception as ex:
                     self.console_message("exception creating bucket on attempt {atmpt}.".format(atmpt=retry_attempts))
+                    self.console_message(ex, level=2)
                     retry_attempts = retry_attempts - 1
                     ___ship(retry_attempts, 1)
 
