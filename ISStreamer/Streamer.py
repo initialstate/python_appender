@@ -131,6 +131,9 @@ class Streamer:
                         self.console_message("bucket created with \n   bucket_key: {bk} \n   bucket_name: {bn}".format(bk=new_bucket_key, bn=new_bucket_name), level=2)
                     elif (response.status == 401 or response.status == 403):
                         self.console_message("ERROR: ClientKey not authorized: " + self.ClientKey)
+                    elif (response.status == 402)
+                        self.console_message("ClientKey exceeded limit for month, check account at www.initialstate.com/app")
+                        raise Exception("Either account is capped or an upgrade is required.")
                     else:
                         self.console_message("ISStreamer failed to setup the bucket on attempt {atmpt}. StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
                         raise Exception("ship exception")
@@ -197,6 +200,9 @@ class Streamer:
                     self.console_message("ship: success!", level=2)
                 elif (response.status == 401 or response.status == 403):
                     self.console_message("ERROR: unauthorized client_key: " + self.ClientKey)
+                elif (response.status == 402)
+                        self.console_message("ClientKey exceeded limit for month, check account at www.initialstate.com/app")
+                        raise Exception("Either account is capped or an upgrade is required.")
                 else:
                     self.console_message("ship: failed on attempt {atmpt} (StatusCode: {sc}; Reason: {r})".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
                     raise Exception("ship exception")

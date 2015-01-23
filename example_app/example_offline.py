@@ -4,8 +4,8 @@ from ISStreamer.Streamer import Streamer
 logger = Streamer(bucket_name="Stream Example", debug_level=2, offline=True)
 
 logger.log("My Messages", "Stream Starting")
-for num in range(1, 100):
-        time.sleep(0.1)
+for num in range(1, 1000):
+        time.sleep(0.001)
         logger.log("My Numbers", num)
         if num%2 == 0:
                 logger.log("My Booleans", False)
