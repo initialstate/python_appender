@@ -5,22 +5,22 @@ import sys, getopt
 
 def main(argv):
 	bucket = ''
-	client_key = ''
+	access_key = ''
 	try:
-		opts, args = getopt.getopt(argv,"hb:k:",["bucket_name=", "client_key="])
+		opts, args = getopt.getopt(argv,"hb:k:",["bucket_name=", "access_key="])
 	except getopt.GetoptError:
-		print('example_command_line.py -b <bucket_name> -k <client_key>')
+		print('example_command_line.py -b <bucket_name> -k <access_key>')
 
 	for opt, arg in opts:
 		if opt == '-h':
-			print('example_command_line.py -b <bucket_name> -k <client_key>')
+			print('example_command_line.py -b <bucket_name> -k <access_key>')
 		elif opt in ("-b", "--bucket_name"):
 			bucket = arg
-		elif opt in ("-k", "--client_key"):
-			client_key = arg
+		elif opt in ("-k", "--access_key"):
+			access_key = arg
 
 
-	streamer = Streamer(bucket_name=bucket, client_key=client_key)
+	streamer = Streamer(bucket_name=bucket, access_key=access_key)
 
 	try:
 		while 1:

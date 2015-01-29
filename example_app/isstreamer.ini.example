@@ -1,5 +1,5 @@
 #[isstreamer.client_config]
-#client_key: example_key
+#access_key: example_key
 #default_bucket: example_bucket
 #offline_mode: false
 #offline_file: ./testing_config

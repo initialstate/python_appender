@@ -29,7 +29,7 @@ import csv
 
 class Streamer:
     BucketName = ""
-    ClientKey = ""
+    AccessKey = ""
     Channel = ""
     BufferSize = 10
     StreamApiBase = ""
@@ -40,7 +40,7 @@ class Streamer:
     Offline = False
     LocalFile = None
     ApiVersion = '0.0.1'
-    def __init__(self, bucket_name="", bucket_key="", client_key="", ini_file_location=None, debug_level=0, buffer_size=10, offline=None):
+    def __init__(self, bucket_name="", bucket_key="", access_key="", ini_file_location=None, debug_level=0, buffer_size=10, offline=None):
         config = configutil.getConfig(ini_file_location)
         if (offline != None):
             self.Offline = offline
@@ -58,17 +58,17 @@ class Streamer:
             except:
                 print("There was an issue opening the file (nees more description)")
 
-        if (config == None and bucket_name=="" and client_key == ""):
+        if (config == None and bucket_name=="" and access_key == ""):
             raise Exception("config not found and arguments empty")
         
         if (bucket_name == ""):
             bucket_name = config["bucket"]
         else:
             bucket_name = bucket_name
-        if (client_key == ""):
-            self.ClientKey = config["clientKey"]
+        if (access_key == ""):
+            self.AccessKey = config["access_key"]
         else:
-            self.ClientKey = client_key
+            self.AccessKey = access_key
 
 
         #self.LogQueue = Queue.Queue(self.BufferSize)
@@ -81,13 +81,13 @@ class Streamer:
         self.DebugLevel = debug_level
         self.IsClosed = False
 
-        self.console_message("client_key: {clientKey}".format(clientKey=self.ClientKey))
+        self.console_message("access_key: {accessKey}".format(accessKey=self.AccessKey))
         self.console_message("stream_api_base: {api}".format(api=self.StreamApiBase))
     
 
     def set_bucket(self, bucket_name, bucket_key, retries=3):
 
-        def __create_bucket(new_bucket_name, new_bucket_key, client_key):
+        def __create_bucket(new_bucket_name, new_bucket_key, access_key):
             api_base = self.StreamApiBase
             conn = None
             if (self.StreamApiBase.startswith('https://')):
@@ -103,7 +103,7 @@ class Streamer:
                 'Content-Type': 'application/json',
                 'User-Agent': 'PyStreamer v' + version.__version__,
                 'Accept-Version': self.ApiVersion,
-                'X-IS-ClientKey': client_key
+                'X-IS-AccessKey': access_key
             }
             body = {
                 'bucketKey': new_bucket_key,
@@ -130,9 +130,9 @@ class Streamer:
                         self.console_message("bucket created successfully!", level=2)
                         self.console_message("bucket created with \n   bucket_key: {bk} \n   bucket_name: {bn}".format(bk=new_bucket_key, bn=new_bucket_name), level=2)
                     elif (response.status == 401 or response.status == 403):
-                        self.console_message("ERROR: ClientKey not authorized: " + self.ClientKey)
+                        self.console_message("ERROR: AccessKey not authorized: " + self.AccessKey)
                     elif (response.status == 402):
-                        self.console_message("ClientKey exceeded limit for month, check account at www.initialstate.com/app")
+                        self.console_message("AccessKey exceeded limit for month, check account at www.initialstate.com/app")
                         raise Exception("Either account is capped or an upgrade is required.")
                     else:
                         self.console_message("ISStreamer failed to setup the bucket on attempt {atmpt}. StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
@@ -151,7 +151,7 @@ class Streamer:
         self.BucketKey = bucket_key
         self.BucketName = bucket_name
         if (not self.Offline):
-            t = threading.Thread(target=__create_bucket, args=(bucket_name, bucket_key, self.ClientKey))
+            t = threading.Thread(target=__create_bucket, args=(bucket_name, bucket_key, self.AccessKey))
             t.daemon = False
             t.start()
         else:
@@ -177,7 +177,7 @@ class Streamer:
             'Content-Type': 'application/json',
             'User-Agent': 'PyStreamer v' + version.__version__,
             'Accept-Version': self.ApiVersion,
-            'X-IS-ClientKey': self.ClientKey,
+            'X-IS-AccessKey': self.AccessKey,
             'X-IS-BucketKey': self.BucketKey
         }
 
@@ -199,9 +199,9 @@ class Streamer:
                 if (response.status >= 200 and response.status < 300):
                     self.console_message("ship: success!", level=2)
                 elif (response.status == 401 or response.status == 403):
-                    self.console_message("ERROR: unauthorized client_key: " + self.ClientKey)
+                    self.console_message("ERROR: unauthorized access_key: " + self.AccessKey)
                 elif (response.status == 402):
-                        self.console_message("ClientKey exceeded limit for month, check account at www.initialstate.com/app")
+                        self.console_message("AccessKey exceeded limit for month, check account at www.initialstate.com/app")
                         raise Exception("Either account is capped or an upgrade is required.")
                 else:
                     self.console_message("ship: failed on attempt {atmpt} (StatusCode: {sc}; Reason: {r})".format(sc=response.status, r=response.reason, atmpt=retry_attempts))

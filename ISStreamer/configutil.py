@@ -10,7 +10,7 @@ def getConfig(ini_file_location=None):
     config_file_exists = False
     config_return = {
             "bucket": "",
-            "clientKey": "",
+            "access_key": "",
             "offline_mode": "false",
             "offline_file": "./isstreamer_out.csv",
             "core_api_base": "https://api.initialstate.com",
@@ -41,8 +41,8 @@ def getConfig(ini_file_location=None):
         config = configparser.ConfigParser()
         config.read(config_file_path)
         if (config.has_section("isstreamer.client_config")):
-            if (config.has_option("isstreamer.client_config", "client_key")):
-                config_return["clientKey"] = config.get("isstreamer.client_config", "client_key")
+            if (config.has_option("isstreamer.client_config", "access_key")):
+                config_return["access_key"] = config.get("isstreamer.client_config", "access_key")
             if (config.has_option("isstreamer.client_config", "default_bucket")):
                 config_return["bucket"] = config.get("isstreamer.client_config", "default_bucket")
             if (config.has_option("isstreamer.client_config", "offline_mode")):
