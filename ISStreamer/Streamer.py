@@ -234,32 +234,32 @@ class Streamer:
         self.console_message("flush: finished flushing queue", level=2)
 
 
-    def log_object(self, obj, signal_prefix=None, epoch=None):
+    def log_object(self, obj, key_prefix=None, epoch=None):
         if (epoch == None):
             epoch = time.time()
 
-        if (signal_prefix == None):
-            signal_prefix = str(type(obj).__name__)
+        if (key_prefix == None):
+            key_prefix = str(type(obj).__name__)
 
         if (type(obj).__name__ == 'list'):
             i = 0
             for val in obj:
-                signal_name = "{}_{}".format(signal_prefix, i)
-                self.log(signal_name, val, epoch=epoch)
+                key_name = "{}_{}".format(key_prefix, i)
+                self.log(key_name, val, epoch=epoch)
                 i += 1
         elif (type(obj).__name__ == 'dict'):
             for key in obj:
-                signal_name = "{}_{}".format(signal_prefix, key)
-                self.log(signal_name, obj[key], epoch=epoch)
+                key_name = "{}_{}".format(key_prefix, key)
+                self.log(key_name, obj[key], epoch=epoch)
         else:
             for attr in dir(obj):
                 if not isinstance(getattr(type(obj), attr, None), property):
                     continue
-                signal_name = "{}_{}".format(signal_prefix, attr)
-                self.log(signal_name, getattr(obj, attr), epoch=epoch)
+                key_name = "{}_{}".format(key_prefix, attr)
+                self.log(key_name, getattr(obj, attr), epoch=epoch)
 
 
-    def log(self, signal, value, epoch=None):
+    def log(self, key, value, epoch=None):
         def __ship_ten():
             i = self.BufferSize
             messages = []
@@ -287,7 +287,7 @@ class Streamer:
                 self.console_message("epoch was overriden with invalid time, using current timstamp instead")
         
         formatted_gmTime = gmtime.strftime('%Y-%m-%d %H:%M:%S.%f')
-        self.console_message("{time}: {signal} {value}".format(signal=signal, value=value, time=formatted_gmTime))
+        self.console_message("{time}: {key} {value}".format(key=key, value=value, time=formatted_gmTime))
         
         if (not self.Offline):
             if (len(self.LogQueue) >= self.BufferSize):
@@ -298,13 +298,13 @@ class Streamer:
         
             self.console_message("log: queueing log item", level=2)
             log_item = {
-                "signal": signal,
+                "key": key,
                 "value": value,
                 "epoch": timeStamp
             }
             self.LogQueue.append(log_item)
         else:
-            self.LocalFile.writerow([timeStamp, signal, value])
+            self.LocalFile.writerow([timeStamp, key, value])
 
 
     def close(self):
