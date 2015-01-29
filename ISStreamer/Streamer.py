@@ -260,7 +260,7 @@ class Streamer:
 
 
     def log(self, key, value, epoch=None):
-        def __ship_ten():
+        def __ship_buffer():
             i = self.BufferSize
             messages = []
             while(i > 0):
@@ -269,12 +269,12 @@ class Streamer:
                     messages.append(m)
                 except IndexError:
                     i = 0
-                    self.console_message("ship10: queue empty for now, less than 10")
+                    self.console_message("ship_buffer: queue empty")
                 i = i - 1
 
-            self.console_message("ship10: shipping", level=2)
+            self.console_message("ship_buffer: shipping", level=2)
             self.ship_messages(messages)
-            self.console_message("ship10: finished shipping", level=2)
+            self.console_message("ship_buffer: finished shipping", level=2)
 
         timeStamp = time.time()
         gmtime = datetime.datetime.fromtimestamp(timeStamp)
@@ -292,7 +292,7 @@ class Streamer:
         if (not self.Offline):
             if (len(self.LogQueue) >= self.BufferSize):
                 self.console_message("log: queue size approximately at or greater than buffer size, shipping!", level=10)
-                t = threading.Thread(target=__ship_ten)
+                t = threading.Thread(target=__ship_buffer)
                 t.daemon = False
                 t.start()
         
