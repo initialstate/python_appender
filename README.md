@@ -72,7 +72,7 @@ After getting the ISStreamer module, usage is really simple. With the following 
 from ISStreamer.Streamer import Streamer
 
 # create a Streamer instance
-streamer = Streamer(bucket_name="Some Bucket Name", client_key="YourClientKey")
+streamer = Streamer(bucket_name="Some Bucket Name", access_key="YourAccessKey")
 
 # log some data
 streamer.log("signal_test", "hi")
@@ -100,15 +100,15 @@ streamer.close()
 	- `value` is either a string, boolean, or number and it represents a value at the time of the method call.
 	- `epoch` is an optional parameter to override the epoch timestamp, recommended for advanced uses.
 
-- ####`Streamer.log_object(obj[, signal_prefix[, epoch]])`
+- ####`Streamer.log_object(obj[, key_prefix[, epoch]])`
 	This is an enhanced method to abstract having to write a bunch of log statements to log all of the values of an object.
 
 	The `log_object` method expects one parameter, `obj`:
 	- `obj` is either a list, dict, or simple object with attributes.
-		- If `obj` is a list, it will use the signal name `list_n` unless the optional `signal_prefix` is supplied, then it will use `signal_prefix_n` where `n` - in both cases - is an iterator identifier.
-		- If `obj` is a dict, it will use the signal name `dict_key` where unless the optional `signal_prefix` is supplied, then it will use `signal_prefix_key` where `key` - in both cases - is the key of the dictionary value.
-		- If `obj` is a simple object, it will iterate over the objects attributes and produce values for signals with the name of the signal as `obj_attr` unless the `signal_prefix` is supplied, then it will use `signal_prefix_attr`. In all cases, `attr` is the attribute name.
-	- `signal_prefix` is an optional string that optionally overrrides the default signal prefixes.
+		- If `obj` is a list, it will use the signal name `list_n` unless the optional `key_prefix` is supplied, then it will use `key_prefix_n` where `n` - in both cases - is an iterator identifier.
+		- If `obj` is a dict, it will use the signal name `dict_key` where unless the optional `key_prefix` is supplied, then it will use `key_prefix_key` where `key` - in both cases - is the key of the dictionary value.
+		- If `obj` is a simple object, it will iterate over the objects attributes and produce values for signals with the name of the signal as `obj_attr` unless the `key_prefix` is supplied, then it will use `key_prefix_attr`. In all cases, `attr` is the attribute name.
+	- `key_prefix` is an optional string that optionally overrrides the default signal prefixes.
 	- `epoch` is an optional number that represents the current time in epoch format.
 
 	[Here is a working example](/example_app/example_compute_metrics.py).
@@ -126,7 +126,7 @@ streamer.close()
 	You can override the default log buffer size (the count of log items) by passing the optional `buffer_size` parameter into the Streamer constructor. Here is an example:
 
 	```python
-	streamer = Streamer(bucket_name="Hi!", client_key="YourClientKey", buffer_size=20)
+	streamer = Streamer(bucket_name="Hi!", access_key="YourClientKey", buffer_size=20)
 	```
 
 	In this example, the `buffer_size` is being increased to 20 from the default, 10. The decision to override this value should be based on how many log statements you make in a loop before sleeping. You can typically play around with this number help tune performance of the Streamer.
@@ -136,7 +136,7 @@ streamer.close()
 	```python
 	...
 
-	streamer = Streamer(bucket_name="Dynamic Buffer", client_key="YourClientKey", buffer_size=200)
+	streamer = Streamer(bucket_name="Dynamic Buffer", access_key="YourClientKey", buffer_size=200)
 
 	counter = 0
 	while 1:
@@ -147,7 +147,7 @@ streamer.close()
 			"b": 2,
 			"c": 3
 		}
-		streamer.log_object(some_dict, signal_prefix="some_dict")
+		streamer.log_object(some_dict, key_prefix="some_dict")
 
 		dynamic_list = SomeOtherModule.PracticalClass.get_stuff()
 		
@@ -186,10 +186,10 @@ streamer.close()
 
 
 - ####Creating a new bucket
-	When you construct a `Streamer` the constructor expects a name or a key that it will use to ensure there is a bucket that it will use as the context for `Streamer.log(signal, value)`. Buckets are either created or consumed based on the unique combination of a `client_key` and a `bucket_key`. If you want to switch which to a new bucket, because say you've started a new session or run, simply call `Streamer.set_bucket(bucket_name='some_bucket_name'[, bucket_key='some_bucket_key'])`. Note that bucket_key is optional, if not provided the module will create a uuid4 as the `bucket_key`. Here is an example:
+	When you construct a `Streamer` the constructor expects a name or a key that it will use to ensure there is a bucket that it will use as the context for `Streamer.log(signal, value)`. Buckets are either created or consumed based on the unique combination of a `access_key` and a `bucket_key`. If you want to switch which to a new bucket, because say you've started a new session or run, simply call `Streamer.set_bucket(bucket_name='some_bucket_name'[, bucket_key='some_bucket_key'])`. Note that bucket_key is optional, if not provided the module will create a uuid4 as the `bucket_key`. Here is an example:
 	
 	```python
-	streamer = Streamer(bucket_name="Starting Bucket", client_key="YourClientKey")
+	streamer = Streamer(bucket_name="Starting Bucket", access_key="YourClientKey")
 	
 	streamer.log("signal1", "starting")
 	streamer.set_bucket(bucket_name="New Bucket")
@@ -204,7 +204,7 @@ streamer.close()
 If you're having issues with your data you might want to try running ISStreamer at a higher debug level:
 
 ```python
-logger = Streamer(bucket_name="SomeBucketName", client_key="YourClientKey", debug_level=2)
+logger = Streamer(bucket_name="SomeBucketName", access_key="YourClientKey", debug_level=2)
 ```
 
 With a `debug_level` at or greater than 2 the streamer will throw exceptions on logging errors. Otherwise, it will assume logging errors are not fundamentally exceptional. It will also display more verbouse logging information.
