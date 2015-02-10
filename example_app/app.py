@@ -10,6 +10,6 @@ def stress_test_loop(i, num):
 		i = i - 1
 
 
-stress_test_loop(200, 1)
+stress_test_loop(50, 1)
 
 streamer.close()
