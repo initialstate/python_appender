@@ -133,11 +133,14 @@ class Streamer:
                         self.console_message("ERROR: AccessKey not authorized: " + self.AccessKey)
                     elif (response.status == 402):
                         self.console_message("AccessKey exceeded limit for month, check account at www.initialstate.com/app")
-                        raise Exception("Either account is capped or an upgrade is required.")
+                        raise Exception("PAYMENT_REQUIRED")
                     else:
                         self.console_message("ISStreamer failed to setup the bucket on attempt {atmpt}. StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
                         raise Exception("ship exception")
                 except Exception as ex:
+                    if (ex.Message == "PAYMENT_REQUIRED"):
+                        raise Exception("Either account is capped or an upgrade is required.")
+
                     self.console_message("exception creating bucket on attempt {atmpt}.".format(atmpt=retry_attempts))
                     self.console_message(ex, level=2)
                     retry_attempts = retry_attempts - 1
@@ -202,11 +205,13 @@ class Streamer:
                     self.console_message("ERROR: unauthorized access_key: " + self.AccessKey)
                 elif (response.status == 402):
                     self.console_message("AccessKey exceeded limit for month, check account at www.initialstate.com/app")
-                    raise Exception("Either account is capped or an upgrade is required.")
+                    raise Exception("PAYMENT_REQUIRED")
                 else:
                     self.console_message("ship: failed on attempt {atmpt} (StatusCode: {sc}; Reason: {r})".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
                     raise Exception("ship exception")
-            except:
+            except Exception as ex:
+                if (ex.Message == "PAYMENT_REQUIRED"):
+                    raise Exception("Either account is capped or an upgrade is required.")
                 self.console_message("ship: exception shipping logs on attempt {atmpt}.".format(atmpt=retry_attempts))
                 retry_attempts = retry_attempts - 1
                 __ship(retry_attempts, 1)
