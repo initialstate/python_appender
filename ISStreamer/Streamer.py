@@ -201,8 +201,8 @@ class Streamer:
                 elif (response.status == 401 or response.status == 403):
                     self.console_message("ERROR: unauthorized access_key: " + self.AccessKey)
                 elif (response.status == 402):
-                        self.console_message("AccessKey exceeded limit for month, check account at www.initialstate.com/app")
-                        raise Exception("Either account is capped or an upgrade is required.")
+                    self.console_message("AccessKey exceeded limit for month, check account at www.initialstate.com/app")
+                    raise Exception("Either account is capped or an upgrade is required.")
                 else:
                     self.console_message("ship: failed on attempt {atmpt} (StatusCode: {sc}; Reason: {r})".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
                     raise Exception("ship exception")

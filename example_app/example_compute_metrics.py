@@ -3,11 +3,11 @@ import time
 from ISStreamer.Streamer import Streamer
 
 # Provide a client_key from local ini file, override buffer and flush for optimal streaming
-streamer = Streamer(bucket_name="Example Performance Metrics",bucket_key="compute_metrics", buffer_size=100, ini_file_location="./isstreamer.ini", debug_level=2)
+streamer = Streamer(bucket_name="Example Performance Metrics",bucket_key="compute_metrics", buffer_size=100, ini_file_location="./isstreamer.ini", debug_level=1)
 
-sample_rate_in_ms=1000
+sample_rate_in_ms=100
 
-for x in range(100):
+for x in range(1000):
 
 	streamer.log("sample", x)
 	# Get total CPU usage
@@ -16,19 +16,19 @@ for x in range(100):
 
 	# Get individual CPU usage
 	cpu_percents = psutil.cpu_percent(percpu=True)
-	streamer.log_object(cpu_percents, signal_prefix="cpu")
+	streamer.log_object(cpu_percents, key_prefix="cpu")
 	
 	# Get the virtual memory usage
 	memory = psutil.virtual_memory()
-	streamer.log_object(memory, signal_prefix="virtual_mem")
+	streamer.log_object(memory, key_prefix="virtual_mem")
 	
 	# Get the swap memory usage
 	swap = psutil.swap_memory()
-	streamer.log_object(swap, signal_prefix="swap_mem")
+	streamer.log_object(swap, key_prefix="swap_mem")
 
 	# Get the network usage
 	network = psutil.net_io_counters()
-	streamer.log_object(network, signal_prefix="net_io")
+	streamer.log_object(network, key_prefix="net_io")
 
 	# flush the stream to ensure optimal buffer and consumption experience
 	streamer.flush()

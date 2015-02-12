@@ -9,7 +9,7 @@ streamer.log_object({"foo": "1", "bar": "2"})
 
 # Example lists
 cpu_percents = psutil.cpu_percent(percpu=True)
-streamer.log_object(cpu_percents, signal_prefix="cpu")
+streamer.log_object(cpu_percents, key_prefix="cpu")
 streamer.log_object(['1', '2', '3'])
 
 # Example objects with attributes
