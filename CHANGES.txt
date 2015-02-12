@@ -1,7 +1,12 @@
-0.0.25 (unreleased)
+0.0.25 (2015-02-12)
 -------------------
 
-- Nothing changed yet.
+* Entirely new to support new initial state streaming api
+* api is versioned
+* only one api endpiont for streaming events and creating buckets
+* BREAKING: new syntax for constructor parameters: `bucket` -> `bucket_name`, `client_key` -> `access_key`
+* BREAKING: `log_object` parameters: `signal_prefix` -> `key_prefix`
+* BREAKING: `sessionId` is now `bucket_key` which can be configured in the Streamer constructor.
 
 
 0.0.24 (2014-11-24)
