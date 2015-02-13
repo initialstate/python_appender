@@ -1,7 +1,8 @@
 0.0.26 (unreleased)
 -------------------
 
-- Nothing changed yet.
+* bubbling up exception for 402 responses from api to be clearer.
+* added a missed event log so that missed events can be put into a file instead of to std out
 
 
 0.0.25 (2015-02-12)

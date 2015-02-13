@@ -40,6 +40,7 @@ class Streamer:
     Offline = False
     LocalFile = None
     ApiVersion = '0.0.1'
+    MissedEvents = None
     def __init__(self, bucket_name="", bucket_key="", access_key="", ini_file_location=None, debug_level=0, buffer_size=10, offline=None):
         config = configutil.getConfig(ini_file_location)
         if (offline != None):
@@ -61,6 +62,8 @@ class Streamer:
         if (config == None and bucket_name=="" and access_key == ""):
             raise Exception("config not found and arguments empty")
         
+        self.MissedEvents = open("err_missed_events.txt", 'w+')
+
         if (bucket_name == ""):
             bucket_name = config["bucket"]
         else:
@@ -190,7 +193,9 @@ class Streamer:
                 if (self.DebugLevel >= 2):
                     raise Exception("shipping logs failed.. network issue?")
                 else:
-                    self.console_message("ship: ISStreamer failed to ship the logs after a number of attempts {msgs}".format(msgs=json.dumps(messages)), level=0)
+                    self.console_message("ship: ISStreamer failed to ship the logs after a number of attempts.", level=0)
+                    if (self.MissedEvents not None):
+                        self.MissedEvents.write("{}\n".format(json.dumps(messages)))
                     return
             
             try:
@@ -212,6 +217,7 @@ class Streamer:
             except Exception as ex:
                 if (ex.Message == "PAYMENT_REQUIRED"):
                     raise Exception("Either account is capped or an upgrade is required.")
+
                 self.console_message("ship: exception shipping logs on attempt {atmpt}.".format(atmpt=retry_attempts))
                 retry_attempts = retry_attempts - 1
                 __ship(retry_attempts, 1)
