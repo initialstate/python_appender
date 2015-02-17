@@ -1,6 +1,8 @@
 Python Data Streamer
 ===============
 
+[![Join the chat at https://gitter.im/InitialState/python_appender](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/InitialState/python_appender?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 This is a Python module currently built for python >= 2.7
 
 ##Installation
