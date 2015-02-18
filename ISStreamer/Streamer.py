@@ -61,8 +61,6 @@ class Streamer:
 
         if (config == None and bucket_name=="" and access_key == ""):
             raise Exception("config not found and arguments empty")
-        
-        self.MissedEvents = open("err_missed_events.txt", 'w+')
 
         if (bucket_name == ""):
             bucket_name = config["bucket"]
@@ -141,7 +139,7 @@ class Streamer:
                         self.console_message("ISStreamer failed to setup the bucket on attempt {atmpt}. StatusCode: {sc}; Reason: {r}".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
                         raise Exception("ship exception")
                 except Exception as ex:
-                    if (ex.Message == "PAYMENT_REQUIRED"):
+                    if (len(ex.args) > 0 and ex.args[0] == "PAYMENT_REQUIRED"):
                         raise Exception("Either account is capped or an upgrade is required.")
 
                     self.console_message("exception creating bucket on attempt {atmpt}.".format(atmpt=retry_attempts))
@@ -194,7 +192,9 @@ class Streamer:
                     raise Exception("shipping logs failed.. network issue?")
                 else:
                     self.console_message("ship: ISStreamer failed to ship the logs after a number of attempts.", level=0)
-                    if (self.MissedEvents not None):
+                    if (self.MissedEvents == None):
+                        self.MissedEvents = open("err_missed_events.txt", 'w+')
+                    if (self.MissedEvents != None):
                         self.MissedEvents.write("{}\n".format(json.dumps(messages)))
                     return
             
@@ -215,7 +215,7 @@ class Streamer:
                     self.console_message("ship: failed on attempt {atmpt} (StatusCode: {sc}; Reason: {r})".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
                     raise Exception("ship exception")
             except Exception as ex:
-                if (ex.Message == "PAYMENT_REQUIRED"):
+                if (len(ex.args) > 0 and ex.args[0] == "PAYMENT_REQUIRED"):
                     raise Exception("Either account is capped or an upgrade is required.")
 
                 self.console_message("ship: exception shipping logs on attempt {atmpt}.".format(atmpt=retry_attempts))
@@ -321,6 +321,7 @@ class Streamer:
     def close(self):
         self.IsClosed = True
         self.flush()
+        self.MissedEvents.close()
         if (self.Offline):
             self.console_message("closing local file handler", level=2)
             self.LocalFileHandler.close()
@@ -329,7 +330,7 @@ class Streamer:
         """Try to close/flush the cache before destruction"""
         try:
             if (not self.IsClosed):
-                self.flush()
+                self.close()
         except:
             if (self.DebugLevel >= 2):
                 raise Exception("failed to close the buffer, make sure to explicitly call close() on the Streamer")
