@@ -321,7 +321,8 @@ class Streamer:
     def close(self):
         self.IsClosed = True
         self.flush()
-        self.MissedEvents.close()
+        if (self.MissedEvents != None):
+            self.MissedEvents.close()
         if (self.Offline):
             self.console_message("closing local file handler", level=2)
             self.LocalFileHandler.close()
