@@ -1,3 +1,9 @@
+#########
+# Use: python ./example_read_csv.py -b your_bucket_key -k your_access_key -f 'csv_file_location.csv'
+# Note: The CSV file structure should NOT contain a header and should be in the following format
+#       <ISO-8601 Date Time>,<StreamKey>,<StreamValue>/n
+##########
+
 import getopt, sys, time, csv
 from ISStreamer.Streamer import Streamer
 
