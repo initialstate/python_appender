@@ -130,6 +130,8 @@ class Streamer:
                     elif (response.status == 201):
                         self.console_message("bucket created successfully!", level=2)
                         self.console_message("bucket created with \n   bucket_key: {bk} \n   bucket_name: {bn}".format(bk=new_bucket_key, bn=new_bucket_name), level=2)
+                    elif (response.status == 400):
+                        self.console_message("bucket couldn't be found or created: {error}".format(error=response.body))
                     elif (response.status == 401 or response.status == 403):
                         self.console_message("ERROR: AccessKey not authorized: " + self.AccessKey)
                     elif (response.status == 402):
