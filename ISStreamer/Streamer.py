@@ -86,7 +86,7 @@ class Streamer:
         self.console_message("stream_api_base: {api}".format(api=self.StreamApiBase))
     
 
-    def set_bucket(self, bucket_name, bucket_key, retries=3):
+    def set_bucket(self, bucket_name="", bucket_key="", retries=3):
 
         def __create_bucket(new_bucket_name, new_bucket_key, access_key):
             api_base = self.StreamApiBase
