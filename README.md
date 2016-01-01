@@ -74,7 +74,7 @@ After getting the ISStreamer module, usage is really simple. With the following 
 from ISStreamer.Streamer import Streamer
 
 # create a Streamer instance
-streamer = Streamer(bucket_name="Some Bucket Name", access_key="YourAccessKey")
+streamer = Streamer(bucket_name="Some Bucket Name", bucket_key="bucket_key", access_key="YourAccessKey")
 
 # send some data
 streamer.log("test", "hi")
