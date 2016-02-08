@@ -191,9 +191,9 @@ class Streamer:
             self.console_message("ship: beginning message ship!", level=2)
             if (retry_attempts <= 0):
                 if (self.DebugLevel >= 2):
-                    raise Exception("shipping logs failed.. network issue?")
+                    raise Exception("shipping failed.. network issue?")
                 else:
-                    self.console_message("ship: ISStreamer failed to ship the logs after a number of attempts.", level=0)
+                    self.console_message("ship: ISStreamer failed to ship after a number of attempts.", level=0)
                     if (self.MissedEvents == None):
                         self.MissedEvents = open("err_missed_events.txt", 'w+')
                     if (self.MissedEvents != None):
@@ -213,14 +213,19 @@ class Streamer:
                 elif (response.status == 402):
                     self.console_message("AccessKey exceeded limit for month, check account at www.initialstate.com/app")
                     raise Exception("PAYMENT_REQUIRED")
+                elif (response.status == 429):
+                    self.console_message("Request limit exceeded")
+                    raise Exception("REQUEST_LIMIT_EXCEEDED")
                 else:
                     self.console_message("ship: failed on attempt {atmpt} (StatusCode: {sc}; Reason: {r})".format(sc=response.status, r=response.reason, atmpt=retry_attempts))
                     raise Exception("ship exception")
             except Exception as ex:
                 if (len(ex.args) > 0 and ex.args[0] == "PAYMENT_REQUIRED"):
                     raise Exception("Either account is capped or an upgrade is required.")
+                if (len(ex.args) > 0 and ex.args[0] == "REQUEST_LIMIT_EXCEEDED"):
+                    raise Exception("Request limit has been exceeded, please limit request rate.")
 
-                self.console_message("ship: exception shipping logs on attempt {atmpt}.".format(atmpt=retry_attempts))
+                self.console_message("ship: exception shipping on attempt {atmpt}.".format(atmpt=retry_attempts))
                 retry_attempts = retry_attempts - 1
                 __ship(retry_attempts, 1)
 
