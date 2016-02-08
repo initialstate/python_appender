@@ -1,11 +1,11 @@
 language: python
 python:
-    - 2.7.8
-    - 2.7
-    - 3.3
-    - 3.4
-    - 3.5
-    - nightly
+- 2.7.8
+- 2.7
+- 3.3
+- 3.4
+- 3.5
+- nightly
 install: true
 script: echo hello
 deploy:
@@ -18,3 +18,6 @@ deploy:
     distributions: sdist bdist_wheel
     repo: InitialState/python_appender
     branch: master
+notifications:
+  slack:
+    secure: rAnXefiLNiVD2XtRHei42YG9JNDcbzcK/4ZFH2eVMIvYuWIhaeHUeO6kw/A5kGlnk862trhWfvqu6I+Fg0eH040O7DYpRaUDnXOCzLR1zGA5M8qN71uYZsFppPnpDH0TzpVMnIrv2xyjik4zkonJCuAVrLgmLBVCHIt2Bqvs06w=
