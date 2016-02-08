@@ -6,6 +6,7 @@ python:
     - 3.4
     - 3.5
     - nightly
+install: true
 deploy:
   provider: pypi
   user: davidsulpy
