@@ -1,0 +1,18 @@
+language: python
+python:
+	- 2.7.8
+	- 2.7
+	- 3.3
+	- 3.4
+	- 3.5
+	- nightly
+deploy:
+  provider: pypi
+  user: davidsulpy
+  password:
+    secure: a/daKGCkdsiWucEjAY+hbLsov1Ntt3CIEscgQpyAB+KBxaVVbQfQQ8NVjLSMbzblBAiVgClHjZJTWBoY5Xs85rytSfEOUcBNAq6Qi/IHswwyiR8VSq3jLMqEDKqR0KZv/vg+vX/KPw4oD+ShLVPNuecmMFNQu2vNWle1uggtOE8=
+  on:
+    tags: true
+    distributions: sdist bdist_wheel
+    repo: InitialState/python_appender
+    branch: dev
