@@ -203,6 +203,12 @@ class Streamer:
             try:
                 if (wait > 0):
                     time.sleep(wait)
+                #set the connection socket timeout to 120 seconds
+                if sys.version_info[0] >= 2 and sys.version_info[1] >= 3:
+                    conn.sock.settimeout(120.0)
+                else:
+                    conn.sock.set_timeout(120)
+
                 conn.request('POST', resource, json.dumps(messages), headers)
                 response = conn.getresponse()
 
