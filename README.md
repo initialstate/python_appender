@@ -3,7 +3,7 @@ Python Data Streamer
 
 [![Join the chat at https://gitter.im/InitialState/python_appender](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/InitialState/python_appender?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) 
 
-[![Build Status](https://travis-ci.org/InitialState/python_appender.svg?branch=master)](https://travis-ci.org/InitialState/python_appender)
+[![Build Status](https://travis-ci.org/initialstate/python_appender.svg?branch=master)](https://travis-ci.org/initialstate/python_appender)
 
 This is a Python module currently built for python >= 2.7
 
