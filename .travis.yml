@@ -16,7 +16,7 @@ deploy:
   on:
     tags: true
     distributions: sdist bdist_wheel
-    repo: InitialState/python_appender
+    repo: initialstate/python_appender
     branch: master
 notifications:
   slack:
