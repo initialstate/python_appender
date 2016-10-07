@@ -94,11 +94,11 @@ class Streamer:
             if (self.StreamApiBase.startswith('https://')):
                 api_base = self.StreamApiBase[8:]
                 self.console_message("stream api base domain: {domain}".format(domain=api_base), level=2)
-                conn = httplib.HTTPSConnection(api_base)
+                conn = httplib.HTTPSConnection(api_base, timeout=120)
             else:
                 api_base = self.StreamApiBase[7:]
                 self.console_message("stream api base domain: {domain}".format(domain=api_base), level=2)
-                conn = httplib.HTTPConnection(api_base)
+                conn = httplib.HTTPConnection(api_base, timeout=120)
             resource = "/api/buckets"
             headers = {
                 'Content-Type': 'application/json',
@@ -173,11 +173,11 @@ class Streamer:
         if (self.StreamApiBase.startswith('https://')):
             api_base = self.StreamApiBase[8:]
             self.console_message("ship messages: stream api base domain: {domain}".format(domain=api_base), level=2)
-            conn = httplib.HTTPSConnection(api_base)
+            conn = httplib.HTTPSConnection(api_base, timeout=120)
         else:
             api_base = self.StreamApiBase[7:]
             self.console_message("ship messages: stream api base domain: {domain}".format(domain=api_base), level=2)
-            conn = httplib.HTTPConnection(api_base)
+            conn = httplib.HTTPConnection(api_base, timeout=120)
         resource = "/api/events"
         headers = {
             'Content-Type': 'application/json',
@@ -203,11 +203,6 @@ class Streamer:
             try:
                 if (wait > 0):
                     time.sleep(wait)
-                #set the connection socket timeout to 120 seconds
-                if sys.version_info[0] >= 2 and sys.version_info[1] >= 3:
-                    conn.sock.settimeout(120.0)
-                else:
-                    conn.sock.set_timeout(120)
 
                 conn.request('POST', resource, json.dumps(messages), headers)
                 response = conn.getresponse()
