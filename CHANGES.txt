@@ -1,3 +1,11 @@
+0.2.0 (unreleased)
+-------------------
+
+* exposing rate limiting
+* added `async` flag to `Streamer` constructor. When set to `async=false` Streamer will block when shipping to Initial State API in order to wait for the response. 
+* added a wait time based on the `Retry-After` header responded by the API when a `429` response is received 
+* using Initial State API >=0.0.4
+
 0.0.26 (unreleased)
 -------------------
 
