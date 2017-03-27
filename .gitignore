@@ -57,3 +57,5 @@ target/
 
 # example app private files 
 isstreamer.ini
+
+example_app/unpublished/*

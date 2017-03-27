@@ -6,7 +6,7 @@
 * added a wait time based on the `Retry-After` header responded by the API when a `429` response is received 
 * using Initial State API >=0.0.4
 
-0.0.26 (unreleased)
+0.0.26
 -------------------
 
 * bubbling up exception for 402 responses from api to be clearer.

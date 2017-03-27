@@ -131,13 +131,12 @@ class Streamer:
 				response = conn.getresponse()
 
 				if (response.status >= 200 and response.status < 300):
-					self.console_message("ship: " + str(response.status), level=2)
-					self.console_message("ship: headers: " + str(response.msg), level=2)
-					self.console_message("ship: body: " + str(response.read()), level=2)
+					self.console_message("ship: status: " + str(response.status) + "\nheaders: " + str(response.msg), level=2)
+					self.console_message("ship: body: " + str(response.read()), level=3)
 				elif (response.status == 401 or response.status == 403):
 					self.console_message("ERROR: unauthorized access_key: " + self.AccessKey)
 				elif (response.status == 402):
-					self.console_message("AccessKey exceeded limit for month, check account at www.initialstate.com/app")
+					self.console_message("AccessKey exceeded limit for month, check account at https://app.initialstate.com/#/account")
 					raise Exception("PAYMENT_REQUIRED")
 				elif (response.status == 429):
 					if "Retry-After" in response.msg:
@@ -203,8 +202,9 @@ class Streamer:
 				self.console_message("flush: queue empty...", level=2)
 		if len(messages) > 0:
 			self.console_message("flush: queue not empty, shipping", level=2)
+			
 			self.ship_messages(messages)
-		self.console_message("flush: finished flushing queue", level=2)
+			self.console_message("flush: finished flushing queue", level=2)
 
 
 	def log_object(self, obj, key_prefix=None, epoch=None):
@@ -265,8 +265,9 @@ class Streamer:
 		if (not self.Offline):
 			if (len(self.LogQueue) >= self.BufferSize):
 				self.console_message("log: queue size approximately at or greater than buffer size, shipping!", level=10)
-				
+				self.console_message("log: async is {state}".format(async=self.Async))
 				if (self.Async):
+					self.console_message("log: spawning ship thread", level=3)
 					t = threading.Thread(target=__ship_buffer)
 					t.daemon = False
 					t.start()
