@@ -213,7 +213,7 @@ class Streamer:
 
 		if (key_prefix == None):
 			key_prefix = "{}_".format(str(type(obj).__name__))
-		elif (key_prefix != None && key_prefix != ""):
+		elif (key_prefix != None and key_prefix != ""):
 			key_prefix = "{}_".format(key_prefix)
 		else:
 			key_prefix = ""
