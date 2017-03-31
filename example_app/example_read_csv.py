@@ -49,6 +49,6 @@ if __name__ == "__main__":
 			counter += 1
 
 			if counter%10==0:
-				time.sleep(.01) # rest for 10 ms to not go crazy with resources
+				time.sleep(.2) # limit write bandwidth
 
 	streamer.close()
