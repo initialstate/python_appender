@@ -269,7 +269,7 @@ class Streamer:
 		if (not self.Offline):
 			if (len(self.LogQueue) >= self.BufferSize):
 				self.console_message("log: queue size approximately at or greater than buffer size, shipping!", level=10)
-				self.console_message("log: async is {state}".format(async=self.Async))
+				self.console_message("log: async is {async}".format(async=self.Async))
 				if (self.Async):
 					self.console_message("log: spawning ship thread", level=3)
 					t = threading.Thread(target=__ship_buffer)
