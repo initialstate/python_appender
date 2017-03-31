@@ -5,6 +5,7 @@
 * added `async` flag to `Streamer` constructor. When set to `async=false` Streamer will block when shipping to Initial State API in order to wait for the response. 
 * added a wait time based on the `Retry-After` header responded by the API when a `429` response is received 
 * using Initial State API >=0.0.4
+* added the ability to set the key_prefix="" on log_object so that no prefix of `_` character are added to the key of the object stream
 
 0.0.26
 -------------------

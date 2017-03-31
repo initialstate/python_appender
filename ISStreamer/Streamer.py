@@ -212,23 +212,27 @@ class Streamer:
 			epoch = time.time()
 
 		if (key_prefix == None):
-			key_prefix = str(type(obj).__name__)
+			key_prefix = "{}_".format(str(type(obj).__name__))
+		elif (key_prefix != None && key_prefix != ""):
+			key_prefix = "{}_".format(key_prefix)
+		else:
+			key_prefix = ""
 
 		if (type(obj).__name__ == 'list'):
 			i = 0
 			for val in obj:
-				key_name = "{}_{}".format(key_prefix, i)
+				key_name = "{}{}".format(key_prefix, i)
 				self.log(key_name, val, epoch=epoch)
 				i += 1
 		elif (type(obj).__name__ == 'dict'):
 			for key in obj:
-				key_name = "{}_{}".format(key_prefix, key)
+				key_name = "{}{}".format(key_prefix, key)
 				self.log(key_name, obj[key], epoch=epoch)
 		else:
 			for attr in dir(obj):
 				if not isinstance(getattr(type(obj), attr, None), property):
 					continue
-				key_name = "{}_{}".format(key_prefix, attr)
+				key_name = "{}{}".format(key_prefix, attr)
 				self.log(key_name, getattr(obj, attr), epoch=epoch)
 
 
