@@ -7,8 +7,9 @@ Python Data Streamer
 
 This is a Python module currently built for python >= 2.7
 
-##Installation
-###Using the automated script
+## Installation
+
+### Using the automated script
 
 On a Unix based system: (including Raspberry Pi, Mac OS X, Ubuntu) 
 
@@ -27,10 +28,10 @@ sudo yum install curl
 ```
 
 
-###Using Package Management
+### Using Package Management
 The package is hosted in PyPI under the package name [ISStreamer](https://pypi.python.org/pypi/ISStreamer).
 
-####If you don't have `pip`:
+#### If you don't have `pip`:
 
 1. (*optional*) Check if you have python setup tools installed:
 
@@ -57,7 +58,7 @@ The package is hosted in PyPI under the package name [ISStreamer](https://pypi.p
 	$ sudo easy_install pip
 	```
 
-####I've got `pip` what next?:
+#### I've got `pip` what next?:
 
 
 ```
@@ -67,7 +68,7 @@ $ sudo pip install ISStreamer
 > This command installs the ISStreamer module
 	
 
-##Basic Usage
+## Basic Usage
 
 After getting the ISStreamer module, usage is really simple. With the following example, you can do most of what you need, and you **don't need to read further**! However
 
@@ -87,24 +88,26 @@ streamer.close()
 ```
 
 
-##Advanced Usage, Troubleshooting, and Concepts
+## Advanced Usage, Troubleshooting, and Concepts
 
 
-###Concepts
-- ####Buckets
+### Concepts
+
+- #### Buckets
 
 	In order to keep your event streams and visualizations contextually appropriate, we have implemented a concept called `buckets`. A new bucket is automatically created when the Streamer is constructed, however, if you want to append to an existing bucket, or use a key that is more memorable than the uuid that will otherwise be used, you can use the optional `bucket_key` constructor parameter. If a Streamer is constructed with a `bucket_key` that already exists, then any data sent in that Stream will append to the existing bucket.
 
 	> NOTE: `bucket_key`'s uniqueness is scoped to a specific `access_key`.
 
-- ####Event Stream
+- #### Event Stream
 
 	An event stream is a key with an associated set of values with timestamps. These individual events are created every time the `Strmeaer.log` method is called. If an `event_key` is the same for different pieces of data, those pieces of data are represented together in an event stream. This is more of an Initial State concept than a Python Streamer specific concept.
 
 	> Legacy Note: Event Streams use to be called Signals.
 
-###Most Used Methods
-- ####`Streamer.log(key, value[, epoch])`
+### Most Used Methods
+
+- #### `Streamer.log(key, value[, epoch])`
 	This is the core method and api for the event streamer. This is an asyncronous method that pushes your data to a queue that handles sending it off to Initial State's servers. You don't have to worry about anything but calling the method where you want! For the sake of clarity (for those new to python or programming) the `Streamer` would be replaced with the variable reference to a `Streamer` instance.
 	
 	The `log` method expects two parameters, `key` and `value`:
@@ -112,7 +115,7 @@ streamer.close()
 	- `value` is either a string, boolean, or number and it represents a value at the time of the method call.
 	- `epoch` is an optional parameter to override the epoch timestamp, recommended for advanced uses.
 
-- ####`Streamer.log_object(obj[, key_prefix[, epoch]])`
+- #### `Streamer.log_object(obj[, key_prefix[, epoch]])`
 	This is an enhanced method to abstract having to write a bunch of log statements to stream all of the values of an object with multiple data points at a specific time.
 
 	The `log_object` method expects one parameter, `obj`:
@@ -127,14 +130,15 @@ streamer.close()
 
 	> NOTE: log_object will log multiple keys and values, but will override the epoch timestamp of each value so that there is no cpu or iteration skew in the timestamp reported for when those values were logged and streamed.
 
-- ####`Streamer.close()`
+- #### `Streamer.close()`
 	This method ensures that the log buffer is flushed and should be called when a program is exiting. It is also called during the `__del__` magic method of the `Streamer` by python, but it is a best practice to explicitly call it at the end of a program to ensure it is executed.
 
-###Advanced Use
-- ####Manual `Streamer.flush()`
+### Advanced Use
+
+- #### Manual `Streamer.flush()`
 	You can manually flush on your own accord by calling `Streamer.flush()`. This will ensure that anything that has been queued or buffered locally  will get sent to Initial State's servers asap.
 	
-- ####Changing buffer size
+- #### Changing buffer size
 	You can override the default event buffer size (the count of events) by passing the optional `buffer_size` parameter into the Streamer constructor. Here is an example:
 
 	```python
@@ -183,7 +187,7 @@ streamer.close()
 	...
 	```
 
-- ####Overriding the timestamp
+- #### Overriding the timestamp
 	Some have asked for the ability to override the timestamp. Currently, the timestamp is automatically associated with data by retrieving the most accurate timestamp possible from the device as soon as a `log` or `log_object` method is called. However, you can override this by doing the following:
 
 	```python
@@ -197,7 +201,7 @@ streamer.close()
 	For a full example checkout [this](/example_app/time_override_example.py)
 
 
-- ####Creating a new bucket
+- #### Creating a new bucket
 	When you construct a `Streamer` the constructor expects a name or a key that it will use to ensure there is a bucket that it will use as the context for `Streamer.log(key, value)`. Buckets are either created or consumed based on the unique combination of a `access_key` and a `bucket_key`. If you want to switch which to a new bucket, because say you've started a new session or run, simply call `Streamer.set_bucket(bucket_name='some_bucket_name'[, bucket_key='some_bucket_key'])`. Note that bucket_key is optional, if not provided the module will create a `uuid4` as the `bucket_key`. Here is an example:
 	
 	```python
@@ -211,11 +215,12 @@ streamer.close()
 	In this example, you will get a key1=starting in two different buckets: "Starting Bucket" and "New Bucket".
 
 
-###Troubleshooting
-####Missing Events
+### Troubleshooting
+
+#### Missing Events
 If the Streamer cannot ship a set of events during a flush, it will retry a few times before deeming it a failure. If it does fail, it will attempt to save it's payload to a local file. This payload will be in a json format inside a json array. Each array can be individually submitted to Initial State's events api to fill in any missed events.
 
-####Setting `debug_level`
+#### Setting `debug_level`
 If you're having issues with your data you might want to try running ISStreamer at a higher debug level:
 
 ```python
