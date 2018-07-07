@@ -42,7 +42,7 @@ class Streamer:
 	LocalFile = None
 	ApiVersion = '<=0.0.4'
 	MissedEvents = None
-	def __init__(self, bucket_name="", bucket_key="", access_key="", ini_file_location=None, debug_level=0, buffer_size=10, offline=None, async=True):
+	def __init__(self, bucket_name="", bucket_key="", access_key="", ini_file_location=None, debug_level=0, buffer_size=10, offline=None, use_async=True):
 		config = configutil.getConfig(ini_file_location)
 		if (offline != None):
 			self.Offline = offline
@@ -52,7 +52,7 @@ class Streamer:
 			else:
 				self.Offline = True
 
-		self.Async = async
+		self.Async = use_async
 		if (self.Offline):
 			try:
 				file_location = "{}.csv".format(config["offline_file"])
@@ -269,7 +269,7 @@ class Streamer:
 		if (not self.Offline):
 			if (len(self.LogQueue) >= self.BufferSize):
 				self.console_message("log: queue size approximately at or greater than buffer size, shipping!", level=10)
-				self.console_message("log: async is {async}".format(async=self.Async))
+				self.console_message("log: async is {}".format(self.Async))
 				if (self.Async):
 					self.console_message("log: spawning ship thread", level=3)
 					t = threading.Thread(target=__ship_buffer)
