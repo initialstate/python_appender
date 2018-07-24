@@ -86,10 +86,10 @@ class Streamer:
 
 		self.console_message("access_key: {accessKey}".format(accessKey=self.AccessKey))
 		self.console_message("stream_api_base: {api}".format(api=self.StreamApiBase))
-	
+
 	def ship_to_api(self, resource, contents):
 		api_base = self.StreamApiBase
-		
+
 		headers = {
 			'Content-Type': 'application/json',
 			'User-Agent': 'PyStreamer v' + version.__version__,
@@ -121,7 +121,7 @@ class Streamer:
 					if (self.MissedEvents != None):
 						self.MissedEvents.write("{}\n".format(json.dumps(contents)))
 					return
-			
+
 			try:
 				if (wait > 0):
 					self.console_message("ship-debug: pausing thread for {wait} seconds".format(wait=wait))
@@ -153,8 +153,11 @@ class Streamer:
 					raise Exception("Either account is capped or an upgrade is required.")
 
 				self.console_message("ship: exception shipping on attempt {atmpt}.".format(atmpt=retry_attempts))
-				#self.console_message(ex, level=2)
-				raise ex
+				if (self.DebugLevel > 1):
+					raise ex
+				else:
+					self.console_message("exception gobbled: {}".format(str(ex)))
+
 				__ship(retry_attempts, 1)
 
 		__ship(3)
@@ -184,7 +187,7 @@ class Streamer:
 
 	def ship_messages(self, messages, retries=3):
 		self.ship_to_api("/api/events", messages)
-			
+
 
 	def flush(self):
 		if (self.Offline):
@@ -202,7 +205,7 @@ class Streamer:
 				self.console_message("flush: queue empty...", level=2)
 		if len(messages) > 0:
 			self.console_message("flush: queue not empty, shipping", level=2)
-			
+
 			self.ship_messages(messages)
 			self.console_message("flush: finished flushing queue", level=2)
 
@@ -255,17 +258,17 @@ class Streamer:
 
 		timeStamp = time.time()
 		gmtime = datetime.datetime.fromtimestamp(timeStamp)
-		
+
 		if epoch != None:
 			try:
 				gmtime = datetime.datetime.fromtimestamp(epoch)
 				timeStamp = epoch
 			except:
 				self.console_message("epoch was overriden with invalid time, using current timstamp instead")
-		
+
 		formatted_gmTime = gmtime.strftime('%Y-%m-%d %H:%M:%S.%f')
 		self.console_message("{time}: {key} {value}".format(key=key, value=value, time=formatted_gmTime))
-		
+
 		if (not self.Offline):
 			if (len(self.LogQueue) >= self.BufferSize):
 				self.console_message("log: queue size approximately at or greater than buffer size, shipping!", level=10)
@@ -277,7 +280,7 @@ class Streamer:
 					t.start()
 				else:
 					__ship_buffer()
-		
+
 			self.console_message("log: queueing log item", level=2)
 			log_item = {
 				"key": key,
