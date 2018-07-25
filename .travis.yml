@@ -17,6 +17,7 @@ deploy:
     distributions: sdist bdist_wheel
     repo: initialstate/python_appender
     branch: master
+    python: '3.5'
 notifications:
   slack:
     secure: rAnXefiLNiVD2XtRHei42YG9JNDcbzcK/4ZFH2eVMIvYuWIhaeHUeO6kw/A5kGlnk862trhWfvqu6I+Fg0eH040O7DYpRaUDnXOCzLR1zGA5M8qN71uYZsFppPnpDH0TzpVMnIrv2xyjik4zkonJCuAVrLgmLBVCHIt2Bqvs06w=
