@@ -14,7 +14,7 @@ def getConfig(ini_file_location=None):
             "offline_mode": "false",
             "offline_file": "./isstreamer_out.csv",
             "core_api_base": "https://api.initialstate.com",
-            "stream_api_base": "https://groker.initialstate.com"
+            "stream_api_base": "https://groker.init.st"
         }
 
     if (ini_file_location != None):
@@ -27,7 +27,7 @@ def getConfig(ini_file_location=None):
         home = os.path.expanduser("~")
         config_file_home_path = os.path.abspath("{home}/isstreamer.ini".format(home=home))
         config_file_local_path = os.path.abspath("{current}/isstreamer.ini".format(current=os.getcwd()))
-        
+
         config_file_exists = False
         config_file_path = config_file_home_path
         if (os.path.exists(config_file_home_path)):

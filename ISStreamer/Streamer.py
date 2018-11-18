@@ -136,7 +136,7 @@ class Streamer:
 				elif (response.status == 401 or response.status == 403):
 					self.console_message("ERROR: unauthorized access_key: " + self.AccessKey)
 				elif (response.status == 402):
-					self.console_message("AccessKey exceeded limit for month, check account at https://app.initialstate.com/#/account")
+					self.console_message("AccessKey exceeded limit for month, check account")
 					raise Exception("PAYMENT_REQUIRED")
 				elif (response.status == 429):
 					if "Retry-After" in response.msg:
