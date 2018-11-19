@@ -21,6 +21,7 @@ echo "       ---------                                  "
 echo "This may take a couple minutes to install, grab some coffee :)"
 echo "But don't forget to come back, I'll have questions later!"
 echo ""
+INITIALSTATE_AUTH_SVC=${INITIALSTATE_AUTH_SVC:="auth"}
 
 function check_for_easy_install {
     if hash easy_install 2>/dev/null; then
@@ -83,19 +84,25 @@ function check_for_isstreamer {
 		pip install --upgrade ISStreamer
 	fi
 
-	isstreamer_version=$(python -c "import pkg_resources; print(pkg_resources.get_distribution('ISStreamer').version)")
+	isstreamer_version=$(python -c "import ISStreamer.version; print(ISStreamer.version.__version__)")
 
-	echo "Found ISStreamer: $isstreamer_version"
-	isstreamer_version_array=(${isstreamer_version//" "/ })
-	isstreamer_version_num=${isstreamer_version_array[0]}
-	isstreamer_version_num_array=(${isstreamer_version_num//./ })
-	isstreamer_major_version=${isstreamer_version_num_array[0]}
-	isstreamer_minor=${isstreamer_version_num_array[1]}
-	isstreamer_minor_version_array=(${isstreamer_minor//"rc"/ })
-	isstreamer_minor_version=${isstreamer_minor_version_array[0]}
 
-	echo "isstreamer major version: $isstreamer_major_version"
-	echo "isstreamer minor version: $isstreamer_minor_version"
+	if [[ $isstreamer_version == "" ]] ; then
+		echo "No ISStreamer found..."
+		exit 1
+	else
+		echo "Found ISStreamer: $isstreamer_version"
+		isstreamer_version_array=(${isstreamer_version//" "/ })
+		isstreamer_version_num=${isstreamer_version_array[0]}
+		isstreamer_version_num_array=(${isstreamer_version_num//./ })
+		isstreamer_major_version=${isstreamer_version_num_array[0]}
+		isstreamer_minor=${isstreamer_version_num_array[1]}
+		isstreamer_minor_version_array=(${isstreamer_minor//"rc"/ })
+		isstreamer_minor_version=${isstreamer_minor_version_array[0]}
+
+		echo "isstreamer major version: $isstreamer_major_version"
+		echo "isstreamer minor version: $isstreamer_minor_version"
+	fi
 }
 
 function download_script {
@@ -135,7 +142,11 @@ function download_script {
 			example_location="./is_example.py"
 		fi
 
-		python_example=$(curl -X POST "https://api.init.st/dev-auth/python/example" -H "X-USER: $username" -H "X-PASS: $password" -H "Accept-Content: text/plain" -m 30 -d "" -s)
+		echo "getting python example script"
+		if [ "$INITIALSTATE_AUTH_SVC" != "auth" ]; then
+			echo "using $INITIALSTATE_AUTH_SVC"
+		fi
+		python_example=$(curl -X POST "https://api.init.st/$INITIALSTATE_AUTH_SVC/python/example" -H "X-USER: $username" -H "X-PASS: $password" -H "Accept-Content: text/plain" -m 30 -d "" -s)
 
 		if [ "$python_example" = "INVALID_CREDENTIALS" ]; then
 			echo "invalid credentials, let's try that again!"

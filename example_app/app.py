@@ -1,7 +1,7 @@
 from ISStreamer.Streamer import Streamer
 import time, math
 
-streamer = Streamer(bucket_name="test", debug_level=3, ini_file_location="./isstreamer.ini", async=True)
+streamer = Streamer(bucket_key="479DAGGBW86T", debug_level=3, ini_file_location="./isstreamer.ini")
 
 def stress_test_loop(i, num):
 	while i > 0:
