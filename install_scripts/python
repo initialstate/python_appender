@@ -22,6 +22,15 @@ echo "This may take a couple minutes to install, grab some coffee :)"
 echo "But don't forget to come back, I'll have questions later!"
 echo ""
 INITIALSTATE_AUTH_SVC=${INITIALSTATE_AUTH_SVC:="auth"}
+SUDO=''
+
+# if this script is being run by root user
+# then we need to modify file saving commands
+# to make sure ownership is correct
+if [ "$EUID" -eq 0 ]; then
+	SUDO="sudo -u $SUDO_USER"
+fi
+
 
 function check_for_easy_install {
     if hash easy_install 2>/dev/null; then
@@ -129,7 +138,7 @@ function download_script {
 			echo "invalid credentials, let's try that again!"
 			download_script
 		else
-			echo "$python_example" | sudo -u $SUDO_USER tee "$example_location" > /dev/null
+			echo "$python_example" | $SUDO tee "$example_location" > /dev/null
 		fi
 	else
 		echo -n "Enter iot.app.initialstate.com user email: "
@@ -158,7 +167,7 @@ function download_script {
 			echo "there's currently an issue with this endpoint, try again later or email support@initialstate.com. Thanks!"
 			exit 1
 		else
-			echo "$python_example" | sudo -u $SUDO_USER tee "$example_location" > /dev/null
+			echo "$python_example" | $SUDO tee "$example_location" > /dev/null
 		fi
 	fi
 
@@ -181,7 +190,7 @@ function download_script_old {
 		echo "invalid credentials, let's try that again!"
 		download_script
 	else
-		echo "$python_example" | sudo -u $SUDO_USER tee "$example_location" > /dev/null
+		echo "$python_example" | $SUDO tee "$example_location" > /dev/null
 	fi
 }
 
