@@ -129,10 +129,20 @@ class Streamer:
 
 				conn.request('POST', resource, json.dumps(contents), headers)
 				response = conn.getresponse()
+				response_body = response.read()
 
 				if (response.status >= 200 and response.status < 300):
 					self.console_message("ship: status: " + str(response.status) + "\nheaders: " + str(response.msg), level=2)
-					self.console_message("ship: body: " + str(response.read()), level=3)
+					self.console_message("ship: body: " + str(response_body), level=3)
+				elif (response.status == 400):
+					json_err = None
+					try:
+						json_err = json.loads(response_body)
+					except Exception as ex:
+						pass
+					if json_err != None:
+						if (json_err["message"]["error"]["type"] == "BUCKET_REMOVED"):
+							self.console_message("Bucket Creation Failed: " + json_err["message"]["error"]["message"])
 				elif (response.status == 401 or response.status == 403):
 					self.console_message("ERROR: unauthorized access_key: " + self.AccessKey)
 				elif (response.status == 402):
