@@ -6,6 +6,7 @@
 
 import getopt, sys, time, csv
 from ISStreamer.Streamer import Streamer
+from dateutil.parser import *
 
 def read_args(argv):
 	try:
@@ -44,7 +45,7 @@ if __name__ == "__main__":
 		for row in reader:
 			epoch = row[0]
 			if not is_float(epoch):
-				epoch = ((dateutil.parser.parse(epoch))-(dateutil.parser.parse("1970-01-01T00:00:00Z"))).total_seconds()
+				epoch = ((parse(epoch))-(parse("1970-01-01T00:00:00Z"))).total_seconds()
 			streamer.log(row[1], row[2], epoch=epoch)
 			counter += 1
 
