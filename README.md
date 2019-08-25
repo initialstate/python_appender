@@ -83,7 +83,10 @@ streamer = Streamer(bucket_name="Some Bucket Name", bucket_key="bucket_key", acc
 streamer.log("test", "hi")
 streamer.log("temperature", 32)
 
-# flush and close the stream
+# flush data (force the buffer to empty and send)
+streamer.flush()
+
+# close the stream
 streamer.close()
 ```
 
