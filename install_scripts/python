@@ -115,34 +115,33 @@ function check_for_isstreamer {
 }
 
 function download_script {
-		echo -n "Enter iot.app.initialstate.com user email: "
-		read username < /dev/tty
-		echo -n "Enter iot.app.initialstate.com password [input hidden]: "
-		read -s password < /dev/tty
-		echo ""
+	echo -n "Enter iot.app.initialstate.com user email: "
+	read username < /dev/tty
+	echo -n "Enter iot.app.initialstate.com password [input hidden]: "
+	read -s password < /dev/tty
+	echo ""
 
-		if [ -z "$example_location" ]; then
-			example_location="./is_example.py"
-		fi
+	if [ -z "$example_location" ]; then
+		example_location="./is_example.py"
+	fi
 
-		echo "getting python example script"
-		if [ "$INITIALSTATE_AUTH_SVC" != "auth" ]; then
-			echo "using $INITIALSTATE_AUTH_SVC"
-		fi
-		python_example=$(curl -X POST "https://api.init.st/$INITIALSTATE_AUTH_SVC/python/example" -H "X-USER: $username" -H "X-PASS: $password" -H "Accept-Content: text/plain" -m 30 -d "" -s)
+	echo "getting python example script"
+	if [ "$INITIALSTATE_AUTH_SVC" != "auth" ]; then
+		echo "using $INITIALSTATE_AUTH_SVC"
+	fi
+	python_example=$(curl -X POST "https://api.init.st/$INITIALSTATE_AUTH_SVC/python/example" -H "X-USER: $username" -H "X-PASS: $password" -H "Accept-Content: text/plain" -m 30 -d "" -s)
 
-		if [ "$python_example" = "INVALID_CREDENTIALS" ]; then
-			echo "invalid credentials, let's try that again!"
-			download_script
-		elif [ "$python_example" = "NOT_CURRENT" ]; then
-			echo "your account hasn't been migrated, go to iot.app.initialstate.com to sign in or create a new account"
-			download_script
-		elif [ "$python_example" = "{\"message\":\"Missing Authentication Token\"}" ]; then
-			echo "there's currently an issue with this endpoint, try again later or email support@initialstate.com. Thanks!"
-			exit 1
-		else
-			echo "$python_example" | $SUDO tee "$example_location" > /dev/null
-		fi
+	if [ "$python_example" = "INVALID_CREDENTIALS" ]; then
+		echo "invalid credentials, let's try that again!"
+		download_script
+	elif [ "$python_example" = "NOT_CURRENT" ]; then
+		echo "your account hasn't been migrated, go to iot.app.initialstate.com to sign in or create a new account"
+		download_script
+	elif [ "$python_example" = "{\"message\":\"Missing Authentication Token\"}" ]; then
+		echo "there's currently an issue with this endpoint, try again later or email support@initialstate.com. Thanks!"
+		exit 1
+	else
+		echo "$python_example" | $SUDO tee "$example_location" > /dev/null
 	fi
 
 }
@@ -154,8 +153,7 @@ function setup_first_script {
 	if [ "$is_wanted" = "y" ] || [ "$is_wanted" = "Y" ]; then
 		echo "Where do you want to save the example? [default: ./is_example.py]: "
 		read example_location < /dev/tty
-
-			download_script
+		download_script
 	fi
 
 	echo "All done!"
