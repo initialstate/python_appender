@@ -13,7 +13,6 @@ def getConfig(ini_file_location=None):
             "access_key": "",
             "offline_mode": "false",
             "offline_file": "./isstreamer_out.csv",
-            "core_api_base": "https://api.initialstate.com",
             "stream_api_base": "https://groker.init.st"
         }
 
@@ -49,11 +48,6 @@ def getConfig(ini_file_location=None):
                 config_return["offline_mode"] = config.get("isstreamer.client_config", "offline_mode")
             if (config.has_option("isstreamer.client_config", "offline_file")):
                 config_return["offline_file"] = config.get("isstreamer.client_config", "offline_file")
-        if (config.has_section("isstreamer.api_config")):
-            if (config.has_option("isstreamer.api_config", "core_api_base")):
-                config_return["core_api_base"] = config.get("isstreamer.api_config", "core_api_base")
-                if (not config_return["core_api_base"].startswith("https://") and not config_return["core_api_base"].startswith("http://")):
-                    raise Exception("core_api_base must start with valid http:// or https://")
             if (config.has_option("isstreamer.api_config", "stream_api_base")):
                 config_return["stream_api_base"] = config.get("isstreamer.api_config", "stream_api_base")
                 if (not config_return["stream_api_base"].startswith("https://") and not config_return["stream_api_base"].startswith("http://")):

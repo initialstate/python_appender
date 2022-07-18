@@ -115,32 +115,6 @@ function check_for_isstreamer {
 }
 
 function download_script {
-	echo "Please select which Initial State app you're using: "
-	echo "1) app.initialstate.com"
-	echo "2) [NEW!] iot.app.initialstate.com"
-	echo -n "Enter choice 1 or 2: "
-	read app_version < /dev/tty
-
-	if [ "$app_version" = "1" ]; then
-		echo -n "Enter app.initialstate.com user email: "
-		read username < /dev/tty
-		echo -n "Enter app.initialstate.com password [input hidden]: "
-		read -s password < /dev/tty
-		echo ""
-
-		if [ -z "$example_location" ]; then
-			example_location="./is_example.py"
-		fi
-
-		python_example=$(curl -X POST "https://api.initialstate.com/api/v1/python/example" -H "X-USER: $username" -H "X-SEC: $password" -H "Accept-Content: text/plain" -m 30 -d "" -s)
-
-		if [ "$python_example" = "INVALID_CREDENTIALS" ]; then
-			echo "invalid credentials, let's try that again!"
-			download_script
-		else
-			echo "$python_example" | $SUDO tee "$example_location" > /dev/null
-		fi
-	else
 		echo -n "Enter iot.app.initialstate.com user email: "
 		read username < /dev/tty
 		echo -n "Enter iot.app.initialstate.com password [input hidden]: "
@@ -173,27 +147,6 @@ function download_script {
 
 }
 
-function download_script_old {
-	echo -n "Enter app.initialstate.com user email: "
-	read username < /dev/tty
-	echo -n "Enter app.initialstate.com password [input hidden]: "
-	read -s password < /dev/tty
-	echo ""
-
-	if [ -z "$example_location" ]; then
-		example_location="./is_example.py"
-	fi
-
-	python_example=$(curl -X POST "https://api.initialstate.com/api/v1/python/example" -H "X-USER: $username" -H "X-SEC: $password" -H "Accept-Content: text/plain" -m 30 -d "" -s)
-
-	if [ "$python_example" = "INVALID_CREDENTIALS" ]; then
-		echo "invalid credentials, let's try that again!"
-		download_script
-	else
-		echo "$python_example" | $SUDO tee "$example_location" > /dev/null
-	fi
-}
-
 function setup_first_script {
 	echo -n "Do you want automagically get an example script? [y/N] "
 	read is_wanted < /dev/tty
@@ -202,11 +155,7 @@ function setup_first_script {
 		echo "Where do you want to save the example? [default: ./is_example.py]: "
 		read example_location < /dev/tty
 
-		if [ "$isstreamer_major_version" -gt "0" ]; then
 			download_script
-		else
-			download_script_old
-		fi
 	fi
 
 	echo "All done!"
