@@ -1,0 +1,79 @@
+name: is-repo-lint
+on:
+  push:
+    branches: [ $default-branch ]
+  pull_request:
+    branches: [ $default-branch ]
+  workflow_dispatch:
+jobs:
+  check-for-codeowners-file:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Check for CODEOWNERS
+        id: codeowners_file
+        uses: initialstate/file-check-action@v1
+        with:
+          file: ".github/CODEOWNERS"
+
+      - name: CODEOWNERS file Output Test
+        run: echo ${{ steps.codeowners_file.outputs.file_exists }}
+
+      - name: CODEOWNERS file exists with content
+        if: steps.codeowners_file.outputs.file_exists == 'true'
+        run: echo CODEOWNERS file exists!
+
+      - name: CODEOWNERS file does not exist
+        if: steps.codeowners_file.outputs.file_exists == 'false'
+        run: echo CODEOWNERS file does not exist!
+
+  check-for-readme-file:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Check for README.md
+        id: readme_file
+        uses: initialstate/file-check-action@v1
+        with:
+          file: "README"
+
+      - name: README file Output Test
+        run: echo ${{ steps.readme_file.outputs.file_exists }}
+
+      - name: README file exists with content
+        if: steps.readme_file.outputs.file_exists == 'true'
+        run: echo README file exists!
+
+      - name: README file does not exist
+        if: steps.readme_file.outputs.file_exists == 'false'
+        run: echo README file does not exist!
+
+  check-for-license:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Check for LICENSE.md
+        id: license_file
+        uses: initialstate/file-check-action@v1
+        with:
+          file: "LICENSE"
+
+      - name: LICENSE file Output Test
+        run: echo ${{ steps.license_file.outputs.file_exists }}
+
+      - name: LICENSE file exists with content
+        if: steps.license_file.outputs.file_exists == 'true'
+        run: echo LICENSE file exists!
+
+      - name: LICENSE file does not exist
+        if: steps.license_file.outputs.file_exists == 'false'
+        run: echo LICENSE file does not exist!
