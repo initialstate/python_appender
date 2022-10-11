@@ -1,9 +1,9 @@
 name: is-repo-lint
 on:
   push:
-    branches: [ $default-branch ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ $default-branch ]
+    branches: [ "master" ]
   workflow_dispatch:
 jobs:
   check-for-codeowners-file:
@@ -77,3 +77,64 @@ jobs:
       - name: LICENSE file does not exist
         if: steps.license_file.outputs.file_exists == 'false'
         run: echo LICENSE file does not exist!
+
+  check-for-dependabot-file:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Check for dependabot.yml
+        id: dependabot_file
+        uses: initialstate/file-check-action@v1
+        with:
+          file: ".github/dependabot.yml"
+
+      - name: dependabot.yml file Output Test
+        run: echo ${{ steps.dependabot_file.outputs.file_exists }}
+
+      - name: dependabot file exists with content
+        if: steps.dependabot_file.outputs.file_exists == 'true'
+        run: echo dependabot file exists!
+
+      - name: dependabot file does not exist
+        if: steps.dependabot_file.outputs.file_exists == 'false'
+        run: echo dependabot file does not exist!
+
+  check-for-codeql-file:
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Check for codeql-analysis.yml
+        id: codeql-analysis_file
+        uses: initialstate/file-check-action@v1
+        with:
+          file: ".github/workflows/codeql-analysis.yml"
+
+      - name: codeql-analysis.yml file Output Test
+        run: echo ${{ steps.codeql-analysis_file.outputs.file_exists }}
+
+      - name: codeql-analysis file exists with content
+        if: steps.codeql-analysis_file.outputs.file_exists == 'true'
+        run: echo codeql-analysis file exists!
+
+      - name: codeql-analysis file does not exist
+        if: steps.codeql-analysis_file.outputs.file_exists == 'false'
+        run: echo codeql-analysis file does not exist!
+
+  check-for-personal-access-token:
+      runs-on: ubuntu-latest
+      steps:
+
+          - name: Check for missing PERSONAL_ACCESS_TOKEN
+            env:
+                MY_KEY: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+            if: "${{ env.MY_KEY == '' }}"
+            uses: actions/github-script@v6
+            with:
+              script: |
+                core.setFailed('PERSONAL_ACCESS_TOKEN secret is missing. It is needed to successfully run the CLA assistant.')
