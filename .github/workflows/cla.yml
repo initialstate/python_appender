@@ -5,8 +5,31 @@ on:
   pull_request_target:
     types: [opened,closed,synchronize]
 
+# select correct state for repository
+env:
+  # state: private
+  state: public
+
 jobs:
+  public-or-private-repo:
+    runs-on: ubuntu-latest
+    outputs:
+      repostate: ${{ steps.repo-state.outputs.repostate }}
+    steps:
+
+      - name: Repo state
+        id: repo-state
+        run: echo "repostate=${{env.state}}" >> $GITHUB_OUTPUT
+      - name: Repo public?
+        if: "${{ env.state == 'public' }}"
+        run: echo "Workflow has repo set as public. If this is incorrect, uncomment line 10."
+      - name: Repo private?
+        if: "${{ env.state == 'private' }}"
+        run: echo "Workflow has repo set as private. If this is incorrect, uncomment line 11."
+
   CLAssistant:
+    needs: public-or-private-repo
+    if: needs.public-or-private-repo.outputs.repostate == 'public'
     runs-on: ubuntu-latest
     steps:
       - name: "CLA Assistant"
@@ -22,7 +45,7 @@ jobs:
           path-to-document: 'https://github.com/cla-assistant/github-action/blob/master/SAPCLA.md' # e.g. a CLA or a DCO document
           # branch should not be protected
           branch: 'master'
-          allowlist: bot*, dependabot[bot]
+          allowlist: bot*, dependabot[bot], davidsulpy, rkuhlman, adametry, bborntrager, RChloe, TJBIII, JeffLoucks, krcummings1, ijavierTek
 
          #below are the optional inputs - If the optional inputs are not given, then default values will be taken
           remote-organization-name: 'initialstate'

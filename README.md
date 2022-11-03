@@ -1,6 +1,8 @@
 Python Data Streamer
 ===============
 
+![repo linter workflow](https://github.com/initialstate/python_appender/actions/workflows/is-repo-lint.yml/badge.svg)
+
 [![Join the chat at https://gitter.im/InitialState/python_appender](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/InitialState/python_appender?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) 
 
 [![Build Status](https://travis-ci.com/initialstate/python_appender.svg?branch=master)](https://travis-ci.org/initialstate/python_appender)

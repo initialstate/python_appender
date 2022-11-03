@@ -5,7 +5,29 @@ on:
   pull_request:
     branches: [ "master" ]
   workflow_dispatch:
+
+# select correct state for repository
+env:
+  # state: private
+  state: public
+
 jobs:
+  public-or-private-repo:
+    runs-on: ubuntu-latest
+    outputs:
+      repostate: ${{ steps.repo-state.outputs.repostate }}
+    steps:
+
+      - name: Repo state
+        id: repo-state
+        run: echo "repostate=${{env.state}}" >> $GITHUB_OUTPUT
+      - name: Repo public?
+        if: "${{ env.state == 'public' }}"
+        run: echo "Workflow has repo set as public. If this is incorrect, uncomment line 11."
+      - name: Repo private?
+        if: "${{ env.state == 'private' }}"
+        run: echo "Workflow has repo set as private. If this is incorrect, uncomment line 12."
+
   check-for-codeowners-file:
     runs-on: ubuntu-latest
     steps:
@@ -29,7 +51,7 @@ jobs:
       - name: CODEOWNERS file does not exist
         if: steps.codeowners_file.outputs.file_exists == 'false'
         run: echo CODEOWNERS file does not exist!
-
+  
   check-for-readme-file:
     runs-on: ubuntu-latest
     steps:
@@ -55,6 +77,8 @@ jobs:
         run: echo README file does not exist!
 
   check-for-license:
+    needs: public-or-private-repo
+    if: needs.public-or-private-repo.outputs.repostate == 'public'
     runs-on: ubuntu-latest
     steps:
 
@@ -127,14 +151,16 @@ jobs:
         run: echo codeql-analysis file does not exist!
 
   check-for-personal-access-token:
-      runs-on: ubuntu-latest
-      steps:
+    needs: public-or-private-repo
+    if: needs.public-or-private-repo.outputs.repostate == 'public'
+    runs-on: ubuntu-latest
+    steps:
 
-          - name: Check for missing PERSONAL_ACCESS_TOKEN
-            env:
-                MY_KEY: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-            if: "${{ env.MY_KEY == '' }}"
-            uses: actions/github-script@v6
-            with:
-              script: |
-                core.setFailed('PERSONAL_ACCESS_TOKEN secret is missing. It is needed to successfully run the CLA assistant.')
+      - name: Check for missing PERSONAL_ACCESS_TOKEN
+        env:
+            MY_KEY: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+        if: "${{ env.MY_KEY == '' }}"
+        uses: actions/github-script@v6
+        with:
+          script: |
+            core.setFailed('PERSONAL_ACCESS_TOKEN secret is missing. It is needed to successfully run the CLA assistant.')

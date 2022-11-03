@@ -20,8 +20,32 @@ on:
   schedule:
     - cron: '17 16 * * 4'
 
+# select correct state for repository
+env:
+  # state: private
+  state: public
+
 jobs:
+  public-or-private-repo:
+    runs-on: ubuntu-latest
+    outputs:
+      repostate: ${{ steps.repo-state.outputs.repostate }}
+    steps:
+
+      - name: Repo state
+        id: repo-state
+        run: echo "repostate=${{env.state}}" >> $GITHUB_OUTPUT
+      - name: Repo public?
+        if: "${{ env.state == 'public' }}"
+        run: echo "Workflow has repo set as public. If this is incorrect, uncomment line 25."
+      - name: Repo private?
+        if: "${{ env.state == 'private' }}"
+        run: echo "Workflow has repo set as private. If this is incorrect, uncomment line 26."
+
+# REMEMBER TO CHECK `LANGUAGE` MATRIX FOR CORRECT LANGUAGE SETTINGS
   analyze:
+    needs: public-or-private-repo
+    if: needs.public-or-private-repo.outputs.repostate == 'public'
     name: Analyze
     runs-on: ubuntu-latest
     permissions:
