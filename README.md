@@ -1,5 +1,5 @@
 Python Data Streamer
-===============
+====================
 
 ![repo linter workflow](https://github.com/initialstate/python_appender/actions/workflows/is-repo-lint.yml/badge.svg)
 
