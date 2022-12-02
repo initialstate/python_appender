@@ -45,7 +45,7 @@ jobs:
           path-to-document: 'https://github.com/cla-assistant/github-action/blob/master/SAPCLA.md' # e.g. a CLA or a DCO document
           # branch should not be protected
           branch: 'master'
-          # allowlist: bot*, dependabot[bot], davidsulpy, rkuhlman, adametry, bborntrager, RChloe, TJBIII, JeffLoucks, krcummings1, ijavierTek
+          allowlist: bot*, dependabot[bot], davidsulpy, rkuhlman, adametry, bborntrager, RChloe, TJBIII, JeffLoucks, krcummings1, ijavierTek
 
          #below are the optional inputs - If the optional inputs are not given, then default values will be taken
           remote-organization-name: 'initialstate'
